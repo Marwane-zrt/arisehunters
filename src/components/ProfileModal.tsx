@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, User, Hash, Save, Copy, Check } from 'lucide-react';
+import { X, User, Hash, Save, Copy, Check, AlertTriangle, Trash2 } from 'lucide-react';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { useAuth } from '../hooks/useAuth';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -9,8 +10,11 @@ interface ProfileModalProps {
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   const { profile, updateProfile, loading } = useUserProfile();
+  const { deleteAccount } = useAuth();
   const [nickname, setNickname] = useState(profile?.nickname || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleSave = async () => {
@@ -37,6 +41,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      const { error } = await deleteAccount();
+      if (error) {
+        alert('Failed to delete account. Please try again or contact support.');
+        setIsDeleting(false);
+      } else {
+        onClose();
+      }
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      setIsDeleting(false);
+    }
+  };
+
   if (!isOpen || !profile) return null;
 
   return (
@@ -44,7 +64,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
         <div className="relative bg-black/90 backdrop-blur-sm border border-blue-500/30 rounded-2xl p-8 w-full max-w-md shadow-2xl">
-          
+
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
@@ -124,6 +144,53 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
               </div>
             </div>
           </div>
+
+          {/* Danger Zone */}
+          {showDeleteConfirm ? (
+            <div className="mb-8 bg-red-500/10 border border-red-500/50 rounded-lg p-4 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-start gap-3 mb-4">
+                <AlertTriangle className="text-red-500 flex-shrink-0" size={24} />
+                <div>
+                  <h4 className="text-red-500 font-bold mb-1">Delete Account?</h4>
+                  <p className="text-red-400/80 text-sm">
+                    This action cannot be undone. All your progress, habits, and stats will be permanently lost.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  ) : (
+                    <>
+                      <Trash2 size={16} />
+                      Confirm Delete
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mb-8">
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-red-400 hover:text-red-300 text-sm flex items-center gap-2 transition-colors"
+              >
+                <Trash2 size={16} />
+                Delete Account
+              </button>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-4">

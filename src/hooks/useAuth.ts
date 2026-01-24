@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { deleteAccount as deleteAccountFromDb } from '../lib/database';
 import { User, AuthState } from '../types/auth';
 
 export const useAuth = () => {
@@ -72,24 +73,24 @@ export const useAuth = () => {
       user: null,
       loading: false
     });
-    
+
     try {
       // Check if there's an active session before attempting to sign out
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       // If no session exists, skip the server-side sign out to avoid unnecessary errors
       if (!session) {
         return { error: null };
       }
-      
+
       const { error } = await supabase.auth.signOut();
-      
+
       // Handle the specific case where the session doesn't exist on the server
       // This is not a critical error since the client-side logout is successful
       if (error && error.message === 'Session from session_id claim in JWT does not exist') {
         return { error: null };
       }
-      
+
       return { error };
     } catch (error: any) {
       // Handle any network or other errors during sign out
@@ -99,11 +100,22 @@ export const useAuth = () => {
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      await deleteAccountFromDb();
+      // Auth state change listener will handle the sign out update
+      return { error: null };
+    } catch (error: any) {
+      return { error };
+    }
+  };
+
   return {
     user: authState.user,
     loading: authState.loading,
     signUp,
     signIn,
-    signOut
+    signOut,
+    deleteAccount
   };
 };

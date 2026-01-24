@@ -143,7 +143,7 @@ export const createHabit = async (habitData: HabitFormData): Promise<Habit> => {
 
 export const updateHabit = async (habitId: string, updates: Partial<Habit>): Promise<void> => {
   const updateData: any = {};
-  
+
   if (updates.completedDates !== undefined) updateData.completed_dates = updates.completedDates;
   if (updates.streak !== undefined) updateData.streak = updates.streak;
   if (updates.bestStreak !== undefined) updateData.best_streak = updates.bestStreak;
@@ -280,7 +280,7 @@ export const createGoal = async (goalData: GoalFormData): Promise<Goal> => {
 
 export const updateGoal = async (goalId: string, updates: Partial<Goal>): Promise<void> => {
   const updateData: any = {};
-  
+
   if (updates.isCompleted !== undefined) updateData.is_completed = updates.isCompleted;
   if (updates.completedDate !== undefined) updateData.completed_date = updates.completedDate?.toISOString();
   if (updates.progress !== undefined) updateData.progress = updates.progress;
@@ -336,7 +336,7 @@ export const createMilestone = async (goalId: string, milestoneData: Omit<Milest
 
 export const updateMilestone = async (milestoneId: string, updates: Partial<Milestone>): Promise<void> => {
   const updateData: any = {};
-  
+
   if (updates.isCompleted !== undefined) updateData.is_completed = updates.isCompleted;
   if (updates.completedDate !== undefined) updateData.completed_date = updates.completedDate?.toISOString();
 
@@ -366,7 +366,7 @@ export const deleteMilestone = async (milestoneId: string): Promise<void> => {
 // Helper function to find category by name and get its ID
 export const findCategoryIdByName = async (categoryName: string): Promise<string | null> => {
   if (!categoryName) return null;
-  
+
   const { data, error } = await supabase
     .from('categories')
     .select('id')
@@ -450,7 +450,7 @@ export const createSkill = async (skillData: SkillFormData): Promise<Skill> => {
 
 export const updateSkill = async (skillId: string, updates: Partial<Skill>): Promise<void> => {
   const updateData: any = {};
-  
+
   if (updates.status !== undefined) updateData.status = updates.status;
   if (updates.progress !== undefined) updateData.progress = updates.progress;
   if (updates.completedDate !== undefined) updateData.completed_date = updates.completedDate?.toISOString();
@@ -545,7 +545,7 @@ export const createRule = async (ruleData: RuleFormData): Promise<Rule> => {
 
 export const updateRule = async (ruleId: string, updates: Partial<Rule>): Promise<void> => {
   const updateData: any = {};
-  
+
   if (updates.isActive !== undefined) updateData.is_active = updates.isActive;
   if (updates.totalDaysChecked !== undefined) updateData.total_days_checked = updates.totalDaysChecked;
   if (updates.daysRespected !== undefined) updateData.days_respected = updates.daysRespected;
@@ -660,7 +660,7 @@ export const fetchRuleDailyChecks = async (ruleId?: string): Promise<RuleDailyCh
 
 export const createRuleDailyCheck = async (ruleId: string, respected: boolean): Promise<RuleDailyCheck> => {
   const today = new Date().toISOString().split('T')[0];
-  
+
   // Use upsert to handle duplicate dates
   const { data, error } = await supabase
     .from('rule_daily_checks')
@@ -686,4 +686,16 @@ export const createRuleDailyCheck = async (ruleId: string, respected: boolean): 
     respected: data.respected,
     createdAt: new Date(data.created_at)
   };
+};
+
+// Account Management
+export const deleteAccount = async (): Promise<void> => {
+  const { error } = await supabase.rpc('delete_user');
+
+  if (error) {
+    console.error('Error deleting account:', error);
+    throw new Error('Failed to delete account. Please ensure the system is configured correctly.');
+  }
+
+  await supabase.auth.signOut();
 };

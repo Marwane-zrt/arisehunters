@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { getLocalDateString } from '../utils/dateUtils';
 import { Habit, HabitFormData } from '../types/habit';
 import { Goal, GoalFormData, Milestone } from '../types/goal';
 import { Skill, SkillFormData } from '../types/skill';
@@ -223,7 +224,7 @@ export const createGoal = async (goalData: GoalFormData): Promise<Goal> => {
       title: goalData.title,
       category: goalData.category,
       color: goalData.color,
-      target_date: goalData.targetDate.toISOString().split('T')[0],
+      target_date: getLocalDateString(goalData.targetDate),
       priority: goalData.priority,
       user_id: (await supabase.auth.getUser()).data.user?.id
     })
@@ -244,7 +245,7 @@ export const createGoal = async (goalData: GoalFormData): Promise<Goal> => {
         goalData.milestones.map(milestone => ({
           goal_id: goal.id,
           title: milestone.title,
-          target_date: milestone.targetDate.toISOString().split('T')[0]
+          target_date: getLocalDateString(milestone.targetDate)
         }))
       )
       .select();
@@ -315,7 +316,7 @@ export const createMilestone = async (goalId: string, milestoneData: Omit<Milest
     .insert({
       goal_id: goalId,
       title: milestoneData.title,
-      target_date: milestoneData.targetDate.toISOString().split('T')[0]
+      target_date: getLocalDateString(milestoneData.targetDate)
     })
     .select()
     .single();
@@ -415,7 +416,7 @@ export const createSkill = async (skillData: SkillFormData): Promise<Skill> => {
       level: skillData.level,
       status: skillData.status,
       description: skillData.description,
-      start_date: skillData.startDate.toISOString().split('T')[0],
+      start_date: getLocalDateString(skillData.startDate),
       resources: skillData.resources,
       color: skillData.color,
       progress: skillData.status === 'Mastered' ? 100 : skillData.status === 'Learned' ? 100 : 0,
@@ -609,7 +610,7 @@ export const createRuleViolation = async (ruleId: string, violationData: RuleVio
     .from('rule_violations')
     .insert({
       rule_id: ruleId,
-      violation_date: new Date().toISOString().split('T')[0],
+      violation_date: getLocalDateString(),
       reason: violationData.reason,
       prevention_plan: violationData.preventionPlan
     })
@@ -671,7 +672,7 @@ export const fetchRuleDailyChecks = async (ruleId?: string): Promise<RuleDailyCh
 };
 
 export const createRuleDailyCheck = async (ruleId: string, respected: boolean): Promise<RuleDailyCheck> => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
 
   // Use upsert to handle duplicate dates
   const { data, error } = await supabase

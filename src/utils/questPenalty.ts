@@ -1,16 +1,17 @@
 import { supabase } from '../lib/supabase';
+import { getLocalDateString } from './dateUtils';
 
 export const applyQuestPenalties = async (): Promise<{ success: boolean; message: string; penaltiesApplied: number }> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return { success: false, message: 'No authenticated user', penaltiesApplied: 0 };
     }
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayString = yesterday.toISOString().split('T')[0];
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterdayString = getLocalDateString(yesterdayDate);
 
     // Check if penalties were already applied for yesterday
     const { data: existingLog } = await supabase
@@ -21,10 +22,10 @@ export const applyQuestPenalties = async (): Promise<{ success: boolean; message
       .maybeSingle();
 
     if (existingLog) {
-      return { 
-        success: true, 
-        message: `Penalties already applied for ${yesterdayString}: ${existingLog.message}`, 
-        penaltiesApplied: existingLog.penalties_applied || 0 
+      return {
+        success: true,
+        message: `Penalties already applied for ${yesterdayString}: ${existingLog.message}`,
+        penaltiesApplied: existingLog.penalties_applied || 0
       };
     }
 
@@ -128,7 +129,7 @@ export const applyQuestPenalties = async (): Promise<{ success: boolean; message
       // Apply penalties equal to the number of uncompleted habits in this category
       // but not more than the category's current points
       const penaltiesToApplyToCategory = Math.min(remainingPenalties, categoryHabits.length, category.points);
-      
+
       if (penaltiesToApplyToCategory > 0) {
         const newPoints = category.points - penaltiesToApplyToCategory;
 
@@ -152,7 +153,7 @@ export const applyQuestPenalties = async (): Promise<{ success: boolean; message
     // try to apply them to the General category as a fallback
     if (remainingPenalties > 0 && generalCategory) {
       const penaltiesToApplyToGeneral = Math.min(remainingPenalties, generalCategory.points);
-      
+
       if (penaltiesToApplyToGeneral > 0) {
         const newGeneralPoints = generalCategory.points - penaltiesToApplyToGeneral;
 
@@ -169,7 +170,7 @@ export const applyQuestPenalties = async (): Promise<{ success: boolean; message
       }
     }
 
-    const message = penaltiesApplied > 0 
+    const message = penaltiesApplied > 0
       ? `Applied ${penaltiesApplied}/${totalPenaltiesToApply} penalties. ${penaltyDetails.join(', ')}`
       : `${totalPenaltiesToApply} penalties needed but no points available`;
 
@@ -183,18 +184,18 @@ export const applyQuestPenalties = async (): Promise<{ success: boolean; message
         message: message
       });
 
-    return { 
-      success: true, 
-      message: message, 
-      penaltiesApplied: penaltiesApplied 
+    return {
+      success: true,
+      message: message,
+      penaltiesApplied: penaltiesApplied
     };
 
   } catch (error: any) {
     console.error('Penalty system error:', error);
-    return { 
-      success: false, 
-      message: `Error: ${error.message}`, 
-      penaltiesApplied: 0 
+    return {
+      success: false,
+      message: `Error: ${error.message}`,
+      penaltiesApplied: 0
     };
   }
 };
@@ -202,7 +203,7 @@ export const applyQuestPenalties = async (): Promise<{ success: boolean; message
 export const getLatestPenaltyMessage = async (): Promise<string> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return '';
     }
@@ -223,13 +224,13 @@ export const getLatestPenaltyMessage = async (): Promise<string> => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     // Show message if it's from yesterday or today
-    if (logDate.toDateString() === yesterday.toDateString() || 
-        logDate.toDateString() === today.toDateString()) {
+    if (logDate.toDateString() === yesterday.toDateString() ||
+      logDate.toDateString() === today.toDateString()) {
       return data.message || '';
     }
-    
+
     return '';
   } catch (error) {
     console.error('Error getting penalty message:', error);
@@ -241,7 +242,7 @@ export const checkAndApplyPenaltiesOnAppOpen = async (): Promise<string> => {
   try {
     // Always apply penalties automatically when the app opens
     const result = await applyQuestPenalties();
-    
+
     if (result.success && result.penaltiesApplied > 0) {
       return `⚠️ Daily quest penalties applied: ${result.message}`;
     } else if (result.success && result.message.includes('All quests completed')) {
@@ -252,7 +253,7 @@ export const checkAndApplyPenaltiesOnAppOpen = async (): Promise<string> => {
       // Don't show message if penalties were already applied today
       return '';
     }
-    
+
     return '';
   } catch (error) {
     console.error('Error in penalty check:', error);

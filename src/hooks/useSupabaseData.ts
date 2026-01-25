@@ -10,6 +10,7 @@ import * as db from '../lib/database';
 import * as routinesApi from '../lib/routines';
 import { calculateStreak } from '../utils/habitUtils';
 import { calculateGoalProgress } from '../utils/dateUtils';
+import { getLocalDateString } from '../utils/dateUtils';
 import { checkAndApplyPenaltiesOnAppOpen, getLatestPenaltyMessage } from '../utils/questPenalty';
 import { checkAndUpdateRuleRespect, getAutoRespectMessage } from '../utils/ruleAutoRespect';
 
@@ -303,7 +304,7 @@ export const useSupabaseData = () => {
   };
 
   const toggleHabitComplete = async (habitId: string) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
 

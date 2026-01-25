@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { Habit } from '../types/habit';
-
+import { getLocalDateString } from '../utils/dateUtils';
 import { RuleViolation } from '../types/rule';
 
 interface QuestCalendarProps {
@@ -35,44 +35,50 @@ export const QuestCalendar: React.FC<QuestCalendarProps> = ({ habits, ruleViolat
 
   const getDayStatus = (day: number) => {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const dateString = date.toISOString().split('T')[0];
-    const now = new Date();
+    const dateString = getLocalDateString(date);
+    const todayString = getLocalDateString();
+
+    const isFuture = dateString > todayString;
+    const isToday = dateString === todayString;
 
     // Future dates are neutral
-    if (date > now) {
+    if (isFuture) {
       return 'neutral';
     }
 
-    // Check for violations on this date
+    // Check for violations on this date - ANY violation makes it Red
     const hasViolation = ruleViolations.some(v => {
-      const violationDate = new Date(v.violationDate);
-      return violationDate.toISOString().split('T')[0] === dateString;
+      return getLocalDateString(new Date(v.violationDate)) === dateString;
     });
 
     if (hasViolation) {
       return 'failure';
     }
 
-    // Filter habits that were active on this date
-    // Assuming habit.createdAt is a string or Date. 
-    // In types/habit.ts it says createdAt: Date, but usually from JSON it might be string.
-    // Let's handle both safely or rely on the type.
+    // Filter habits that were active on or before this date
     const activeHabits = habits.filter(habit => {
-      const created = new Date(habit.createdAt);
-      // Normalize to YYYY-MM-DD to compare just dates
-      const createdString = created.toISOString().split('T')[0];
+      const createdString = getLocalDateString(new Date(habit.createdAt));
       return createdString <= dateString;
     });
 
     if (activeHabits.length === 0) return 'neutral';
 
     // Check if all active habits were completed on this date
-    // completedDates is string[] (YYYY-MM-DD)
     const allCompleted = activeHabits.every(habit =>
       habit.completedDates.includes(dateString)
     );
 
-    return allCompleted ? 'success' : 'failure';
+    if (allCompleted) {
+      return 'success';
+    }
+
+    // If it's today and not all quests are done, keep it neutral/highlighted
+    // instead of showing failure/Red immediately.
+    if (isToday) {
+      return 'neutral';
+    }
+
+    return 'failure';
   };
 
   const renderDays = () => {

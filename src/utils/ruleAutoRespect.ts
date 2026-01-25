@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { getLocalDateString } from './dateUtils';
 
 export interface RuleAutoRespectCheck {
   lastCheckDate: string;
@@ -26,17 +27,17 @@ export const saveAutoRespectCheck = (data: RuleAutoRespectCheck): void => {
 };
 
 export const checkAndUpdateRuleRespect = async (): Promise<number> => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
   const lastCheck = getLastAutoRespectCheck();
-  
+
   if (lastCheck && lastCheck.lastCheckDate === today) {
     return 0;
   }
-  
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayString = yesterday.toISOString().split('T')[0];
-  
+
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayString = getLocalDateString(yesterdayDate);
+
   if (!lastCheck) {
     saveAutoRespectCheck({
       lastCheckDate: today,
@@ -44,17 +45,17 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
     });
     return 0;
   }
-  
+
   try {
     const { data: rules, error: rulesError } = await supabase
       .from('rules')
       .select('*')
       .eq('is_active', true);
-    
+
     if (rulesError) {
       return 0;
     }
-    
+
     if (!rules || rules.length === 0) {
       saveAutoRespectCheck({
         lastCheckDate: today,
@@ -62,9 +63,9 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
       });
       return 0;
     }
-    
+
     let rulesProcessed = 0;
-    
+
     for (const rule of rules) {
       const { data: existingCheck, error: checkError } = await supabase
         .from('rule_daily_checks')
@@ -72,26 +73,26 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
         .eq('rule_id', rule.id)
         .eq('check_date', yesterdayString)
         .maybeSingle();
-      
+
       if (checkError) {
         continue;
       }
-      
+
       if (existingCheck) {
         continue;
       }
-      
+
       const { data: violation, error: violationError } = await supabase
         .from('rule_violations')
         .select('*')
         .eq('rule_id', rule.id)
         .eq('violation_date', yesterdayString)
         .maybeSingle();
-      
+
       if (violationError) {
         continue;
       }
-      
+
       if (!violation) {
         try {
           const { error: insertError } = await supabase
@@ -101,16 +102,16 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
               check_date: yesterdayString,
               respected: true
             });
-          
+
           if (insertError) {
             continue;
           }
-          
+
           const newTotalDays = rule.total_days_checked + 1;
           const newRespected = rule.days_respected + 1;
           const newStreak = rule.current_streak + 1;
           const newBestStreak = Math.max(rule.best_streak, newStreak);
-          
+
           const { error: updateError } = await supabase
             .from('rules')
             .update({
@@ -120,25 +121,25 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
               best_streak: newBestStreak
             })
             .eq('id', rule.id);
-          
+
           if (updateError) {
             continue;
           }
-          
+
           rulesProcessed++;
-          
+
         } catch (error) {
         }
       }
     }
-    
+
     saveAutoRespectCheck({
       lastCheckDate: today,
       rulesProcessed
     });
-    
+
     return rulesProcessed;
-    
+
   } catch (error) {
     return 0;
   }
@@ -148,10 +149,10 @@ export const getAutoRespectMessage = (rulesProcessed: number): string => {
   if (rulesProcessed === 0) {
     return '';
   }
-  
+
   if (rulesProcessed === 1) {
     return 'Automatically marked 1 rule as respected for yesterday.';
   }
-  
+
   return `Automatically marked ${rulesProcessed} rules as respected for yesterday.`;
 };

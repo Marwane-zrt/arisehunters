@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AuthWrapper } from './components/AuthWrapper';
 import { UserMenu } from './components/UserMenu';
 import FriendsModal from './components/FriendsModal';
@@ -21,7 +21,7 @@ function App() {
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const [dismissedPenaltyMessage, setDismissedPenaltyMessage] = useState(false);
   const [dismissedAutoRespectMessage, setDismissedAutoRespectMessage] = useState(false);
-  
+
   const {
     habits,
     goals,
@@ -53,6 +53,7 @@ function App() {
     toggleRuleActive,
     deleteRule,
     getRuleViolations,
+    deleteRuleViolation,
     addRoutine,
     updateRoutine,
     deleteRoutine,
@@ -91,7 +92,7 @@ function App() {
       </div>
     );
   }
-  const completedToday = habits.filter(habit => 
+  const completedToday = habits.filter(habit =>
     habit.completedDates.includes(new Date().toISOString().split('T')[0])
   ).length;
   const totalStreak = habits.reduce((sum, habit) => sum + habit.streak, 0);
@@ -152,9 +153,11 @@ function App() {
           <RulesView
             rules={rules}
             categories={categories}
+            ruleViolations={ruleViolations}
             onAddRule={addRule}
             onToggleRuleCheck={toggleRuleCheck}
             onDeleteRule={deleteRule}
+            onDeleteViolation={deleteRuleViolation}
             onToggleRuleActive={toggleRuleActive}
             getRuleViolations={getRuleViolations}
           />
@@ -165,6 +168,7 @@ function App() {
             habits={habits}
             goals={goals}
             categories={categories}
+            ruleViolations={ruleViolations}
           />
         );
       case 'leaderboard':
@@ -187,58 +191,58 @@ function App() {
   return (
     <AuthWrapper>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-3/4 left-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-      </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center pt-4 pb-2">
-          {/* Friends Icon */}
-          <button
-            onClick={() => setShowFriendsModal(true)}
-            className="relative group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
-            <div className="relative flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-blue-500/30 rounded-xl px-4 py-3 text-white hover:border-blue-400/50 transition-all">
-              <Users size={20} className="text-blue-400" />
-              <span className="hidden sm:inline font-medium tracking-wide">Friends</span>
-            </div>
-          </button>
-          
-          {/* User Menu */}
-          <UserMenu />
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-3/4 left-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
         </div>
-        
-        <Header 
-          totalHabits={habits.length}
-          completedToday={completedToday}
-          totalStreak={totalStreak}
-          totalPoints={totalPoints}
-          penaltyMessage={dismissedPenaltyMessage ? undefined : penaltyMessage}
-          autoRespectMessage={dismissedAutoRespectMessage ? undefined : autoRespectMessage}
-          onDismissPenaltyMessage={handleDismissPenaltyMessage}
-          onDismissAutoRespectMessage={handleDismissAutoRespectMessage}
-        />
-        
-        <Navigation 
-          currentView={currentView}
-          onViewChange={setCurrentView}
-        />
-        
-        <main className="pb-8">
-          {renderCurrentView()}
-        </main>
-        
-        {/* Friends Modal */}
-        <FriendsModal
-          isOpen={showFriendsModal}
-          onClose={() => setShowFriendsModal(false)}
-        />
-      </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Bar */}
+          <div className="flex justify-between items-center pt-4 pb-2">
+            {/* Friends Icon */}
+            <button
+              onClick={() => setShowFriendsModal(true)}
+              className="relative group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
+              <div className="relative flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-blue-500/30 rounded-xl px-4 py-3 text-white hover:border-blue-400/50 transition-all">
+                <Users size={20} className="text-blue-400" />
+                <span className="hidden sm:inline font-medium tracking-wide">Friends</span>
+              </div>
+            </button>
+
+            {/* User Menu */}
+            <UserMenu />
+          </div>
+
+          <Header
+            totalHabits={habits.length}
+            completedToday={completedToday}
+            totalStreak={totalStreak}
+            totalPoints={totalPoints}
+            penaltyMessage={dismissedPenaltyMessage ? undefined : penaltyMessage}
+            autoRespectMessage={dismissedAutoRespectMessage ? undefined : autoRespectMessage}
+            onDismissPenaltyMessage={handleDismissPenaltyMessage}
+            onDismissAutoRespectMessage={handleDismissAutoRespectMessage}
+          />
+
+          <Navigation
+            currentView={currentView}
+            onViewChange={setCurrentView}
+          />
+
+          <main className="pb-8">
+            {renderCurrentView()}
+          </main>
+
+          {/* Friends Modal */}
+          <FriendsModal
+            isOpen={showFriendsModal}
+            onClose={() => setShowFriendsModal(false)}
+          />
+        </div>
       </div>
     </AuthWrapper>
   );

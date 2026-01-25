@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Shield, TrendingUp, AlertTriangle, Calendar } from 'lucide-react';
+import { Plus, Shield, TrendingUp, AlertTriangle, Calendar, History as HistoryIcon, Trash2 } from 'lucide-react';
 import { Rule, RuleFormData, RuleViolation } from '../types/rule';
 import { Category } from '../types/category';
 import { RuleCard } from './RuleCard';
@@ -9,9 +9,11 @@ import { getTodayString } from '../utils/storage';
 interface RulesViewProps {
   rules: Rule[];
   categories: Category[];
+  ruleViolations: RuleViolation[];
   onAddRule: (rule: RuleFormData) => void;
   onToggleRuleCheck: (ruleId: string, respected: boolean, violationData?: { reason: string; preventionPlan: string }) => void;
   onDeleteRule: (ruleId: string) => void;
+  onDeleteViolation: (violationId: string) => void;
   onToggleRuleActive: (ruleId: string) => void;
   getRuleViolations: (ruleId: string) => RuleViolation[];
 }
@@ -19,9 +21,11 @@ interface RulesViewProps {
 export const RulesView: React.FC<RulesViewProps> = ({
   rules,
   categories,
+  ruleViolations,
   onAddRule,
   onToggleRuleCheck,
   onDeleteRule,
+  onDeleteViolation,
   onToggleRuleActive,
   getRuleViolations
 }) => {
@@ -33,11 +37,11 @@ export const RulesView: React.FC<RulesViewProps> = ({
     return true; // Placeholder - would check actual daily check data
   }).length;
 
-  const averageRespectRate = rules.length > 0 
+  const averageRespectRate = rules.length > 0
     ? Math.round(rules.reduce((sum, rule) => {
-        const rate = rule.totalDaysChecked > 0 ? (rule.daysRespected / rule.totalDaysChecked) * 100 : 0;
-        return sum + rate;
-      }, 0) / rules.length)
+      const rate = rule.totalDaysChecked > 0 ? (rule.daysRespected / rule.totalDaysChecked) * 100 : 0;
+      return sum + rate;
+    }, 0) / rules.length)
     : 0;
 
   const totalViolations = rules.reduce((sum, rule) => sum + rule.daysViolated, 0);
@@ -59,7 +63,7 @@ export const RulesView: React.FC<RulesViewProps> = ({
             <p className="text-red-300 font-medium text-sm sm:text-base">Honor your commitments and build discipline</p>
           </div>
         </div>
-        
+
         <div className="w-full sm:w-auto">
           <button
             onClick={() => setIsAddModalOpen(true)}
@@ -71,7 +75,7 @@ export const RulesView: React.FC<RulesViewProps> = ({
               <span className="text-sm sm:text-base">New Rule</span>
             </div>
           </button>
-          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -105,7 +109,7 @@ export const RulesView: React.FC<RulesViewProps> = ({
           </div>
           <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 tracking-wide">Establish Your Code</h3>
           <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
-            Create personal rules that define your character and guide your daily actions. 
+            Create personal rules that define your character and guide your daily actions.
             Build discipline through accountability and self-reflection.
           </p>
           <button
@@ -134,9 +138,75 @@ export const RulesView: React.FC<RulesViewProps> = ({
                 violations={getRuleViolations(rule.id)}
                 onToggleCheck={onToggleRuleCheck}
                 onDeleteRule={onDeleteRule}
+                onDeleteViolation={onDeleteViolation}
                 onToggleActive={onToggleRuleActive}
               />
             ))}
+        </div>
+      )}
+
+      {/* Violation History Log */}
+      {ruleViolations.length > 0 && (
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-red-500/20 rounded-lg">
+              <HistoryIcon className="text-red-400" size={20} />
+            </div>
+            <h3 className="text-xl font-bold text-white tracking-wide">Recent Violations History</h3>
+          </div>
+
+          <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-black/40 text-gray-400 text-xs uppercase tracking-wider">
+                    <th className="px-6 py-4 font-bold">Date</th>
+                    <th className="px-6 py-4 font-bold">Rule</th>
+                    <th className="px-6 py-4 font-bold">Reason</th>
+                    <th className="px-6 py-4 font-bold">Prevention Plan</th>
+                    <th className="px-6 py-4 font-bold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700/50">
+                  {[...ruleViolations]
+                    .sort((a, b) => new Date(b.violationDate).getTime() - new Date(a.violationDate).getTime())
+                    .slice(0, 10)
+                    .map(violation => {
+                      const rule = rules.find(r => r.id === violation.ruleId);
+                      return (
+                        <tr key={violation.id} className="hover:bg-white/5 transition-colors group">
+                          <td className="px-6 py-4 text-sm text-gray-300">
+                            {new Date(violation.violationDate).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 text-sm font-bold text-white flex items-center gap-2">
+                            <div
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: rule?.color || '#ef4444' }}
+                            />
+                            {rule?.title || 'Unknown Rule'}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">
+                            {violation.reason}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-400 max-w-xs truncate italic">
+                            {violation.preventionPlan}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => onDeleteViolation(violation.id)}
+                              className="p-2 text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                              title="Delete log entry"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 

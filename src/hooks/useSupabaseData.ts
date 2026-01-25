@@ -700,6 +700,18 @@ export const useSupabaseData = () => {
     return ruleViolations.filter(violation => violation.ruleId === ruleId);
   };
 
+  const deleteRuleViolation = async (violationId: string) => {
+    try {
+      await db.deleteRuleViolation(violationId);
+      const updatedViolations = ruleViolations.filter(v => v.id !== violationId);
+      setRuleViolations(updatedViolations);
+      updateCache('ruleViolations', updatedViolations);
+    } catch (err) {
+      console.error('Error deleting rule violation:', err);
+      setError('Failed to delete rule violation');
+    }
+  };
+
   const addRoutine = async (routineData: RoutineFormData) => {
     try {
       const newRoutine = await routinesApi.createRoutine(routineData);
@@ -809,6 +821,7 @@ export const useSupabaseData = () => {
     toggleRuleActive,
     deleteRule,
     getRuleViolations,
+    deleteRuleViolation,
     addRoutine,
     updateRoutine,
     deleteRoutine,

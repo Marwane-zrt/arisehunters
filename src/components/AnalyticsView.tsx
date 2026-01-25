@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, Award, History } from 'lucide-react';
 import { Habit } from '../types/habit';
 import { Goal } from '../types/goal';
 import { Category } from '../types/category';
+import { RuleViolation } from '../types/rule';
 import { CategoryRadarChart } from './CategoryRadarChart';
 import { PointsHistoryChart } from './PointsHistoryChart';
 import { getRankFromPoints } from '../utils/rankingSystem';
@@ -14,12 +15,14 @@ interface AnalyticsViewProps {
   habits: Habit[];
   goals: Goal[];
   categories: Category[];
+  ruleViolations: RuleViolation[];
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   habits,
   goals,
-  categories
+  categories,
+  ruleViolations
 }) => {
   const [pointsHistory, setPointsHistory] = React.useState<PointsHistoryData | null>(null);
   const [historyLoading, setHistoryLoading] = React.useState(true);
@@ -102,7 +105,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       ) : null}
 
       {/* Quest Calendar */}
-      <QuestCalendar habits={habits} />
+      <QuestCalendar habits={habits} ruleViolations={ruleViolations} />
 
       {/* Category Progress Chart */}
       <CategoryRadarChart categories={categories} />

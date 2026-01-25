@@ -631,6 +631,18 @@ export const createRuleViolation = async (ruleId: string, violationData: RuleVio
   };
 };
 
+export const deleteRuleViolation = async (violationId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('rule_violations')
+    .delete()
+    .eq('id', violationId);
+
+  if (error) {
+    console.error('Error deleting rule violation:', error);
+    throw error;
+  }
+};
+
 // Rule Daily Checks
 export const fetchRuleDailyChecks = async (ruleId?: string): Promise<RuleDailyCheck[]> => {
   let query = supabase

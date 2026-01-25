@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Folder, CreditCard as Edit, Trash2, ChevronDown, ChevronRight, Check, Plus, X } from 'lucide-react';
 import { Routine } from '../types/routine';
 import { Habit } from '../types/habit';
+import { getLocalDateString } from '../utils/dateUtils';
 
 interface RoutineCardProps {
   routine: Routine;
@@ -24,11 +25,11 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showAddQuest, setShowAddQuest] = useState(false);
-  
+
   const routineHabits = habits.filter(habit => routine.habitIds.includes(habit.id));
   const availableHabits = habits.filter(habit => !routine.habitIds.includes(habit.id));
-  const today = new Date().toISOString().split('T')[0];
-  const completedToday = routineHabits.filter(habit => 
+  const today = getLocalDateString();
+  const completedToday = routineHabits.filter(habit =>
     habit.completedDates.includes(today)
   ).length;
 
@@ -36,7 +37,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
     <div className="relative group">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl blur-sm group-hover:blur-md transition-all"></div>
       <div className="relative bg-black/70 backdrop-blur-sm border border-purple-500/30 rounded-xl shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group hover:border-purple-400/50">
-        
+
         {/* Header */}
         <div className="p-4 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
@@ -63,7 +64,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
                 )}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <div className="text-sm text-gray-400">
                 {completedToday}/{routineHabits.length} completed
@@ -89,7 +90,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
               </button>
             </div>
           </div>
-          
+
           {/* Progress Bar */}
           <div className="mt-3">
             <div className="w-full bg-gray-700 rounded-full h-2">
@@ -151,21 +152,20 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
             ) : (
               routineHabits.map(habit => {
                 const isCompletedToday = habit.completedDates.includes(today);
-                
+
                 return (
                   <div key={habit.id} className="relative group">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl blur-sm group-hover:blur-md transition-all"></div>
-                    <div className={`relative flex items-center justify-between p-4 rounded-xl border transition-all duration-300 group hover:shadow-lg ${
-                      isCompletedToday
+                    <div className={`relative flex items-center justify-between p-4 rounded-xl border transition-all duration-300 group hover:shadow-lg ${isCompletedToday
                         ? 'bg-green-500/10 border-green-500/30 hover:border-green-400/50 shadow-green-500/10'
                         : 'bg-black/40 backdrop-blur-sm border-gray-600/30 hover:border-gray-500/50'
-                    }`}>
+                      }`}>
                       <div className="flex items-center gap-4 flex-1 min-w-0">
                         {/* Quest Color Indicator */}
                         <div className="relative">
                           <div
                             className="w-4 h-4 rounded-full border-2 border-white/20 shadow-lg"
-                            style={{ 
+                            style={{
                               backgroundColor: habit.color,
                               boxShadow: `0 0 10px ${habit.color}60`
                             }}
@@ -174,13 +174,12 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
                             <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75"></div>
                           )}
                         </div>
-                        
+
                         {/* Quest Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-1">
-                            <span className={`font-semibold text-sm sm:text-base truncate transition-all ${
-                              isCompletedToday ? 'text-green-300 line-through' : 'text-white'
-                            }`}>
+                            <span className={`font-semibold text-sm sm:text-base truncate transition-all ${isCompletedToday ? 'text-green-300 line-through' : 'text-white'
+                              }`}>
                               {habit.name}
                             </span>
                             {isCompletedToday && (
@@ -190,7 +189,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
                               </div>
                             )}
                           </div>
-                          
+
                           {/* Quest Stats */}
                           <div className="flex items-center gap-4 text-xs">
                             <div className="flex items-center gap-1 text-orange-400">
@@ -209,7 +208,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Action Button */}
                       <button
                         onClick={() => onRemoveQuestFromRoutine(routine.id, habit.id)}
@@ -218,12 +217,11 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
                       >
                         <X size={14} />
                       </button>
-                      
+
                       <button
                         onClick={() => onToggleComplete(habit.id)}
-                        className={`relative group/btn flex-shrink-0 transition-all duration-300 ${
-                          isCompletedToday ? 'scale-110' : 'hover:scale-110'
-                        }`}
+                        className={`relative group/btn flex-shrink-0 transition-all duration-300 ${isCompletedToday ? 'scale-110' : 'hover:scale-110'
+                          }`}
                       >
                         {isCompletedToday ? (
                           <>

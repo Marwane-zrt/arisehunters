@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, CheckCircle, Clock, Flag, Target, Trash2, Plus, X } from 'lucide-react';
 import { Goal, Milestone } from '../types/goal';
-import { getDaysUntilDeadline, isOverdue } from '../utils/dateUtils';
+import { getDaysUntilDeadline, isOverdue, getLocalDateString } from '../utils/dateUtils';
 
 interface GoalCardProps {
   goal: Goal;
@@ -104,9 +104,8 @@ export const GoalCard: React.FC<GoalCardProps> = ({
             {goal.targetDate.toLocaleDateString()}
           </span>
         </div>
-        <div className={`flex items-center gap-1 sm:gap-2 ${
-          overdue ? 'text-red-400' : daysUntil <= 7 ? 'text-yellow-400' : 'text-gray-300'
-        }`}>
+        <div className={`flex items-center gap-1 sm:gap-2 ${overdue ? 'text-red-400' : daysUntil <= 7 ? 'text-yellow-400' : 'text-gray-300'
+          }`}>
           <Clock size={14} />
           <span>
             {overdue ? `${Math.abs(daysUntil)} days overdue` : `${daysUntil} days left`}
@@ -151,28 +150,25 @@ export const GoalCard: React.FC<GoalCardProps> = ({
                 </button>
               </div>
             )}
-            
+
             {goal.milestones.map(milestone => (
               <div
                 key={milestone.id}
-                className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border transition-all group ${
-                  milestone.isCompleted
-                    ? 'bg-green-500/10 border-green-500/30'
-                    : 'bg-gray-700/30 border-gray-600'
-                }`}
+                className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border transition-all group ${milestone.isCompleted
+                  ? 'bg-green-500/10 border-green-500/30'
+                  : 'bg-gray-700/30 border-gray-600'
+                  }`}
               >
                 <button
                   onClick={() => onToggleMilestone(goal.id, milestone.id)}
-                  className={`flex-shrink-0 ${
-                    milestone.isCompleted ? 'text-green-400' : 'text-gray-500 hover:text-green-400'
-                  } transition-colors`}
+                  className={`flex-shrink-0 ${milestone.isCompleted ? 'text-green-400' : 'text-gray-500 hover:text-green-400'
+                    } transition-colors`}
                 >
                   <CheckCircle size={16} />
                 </button>
                 <div className="flex-1">
-                  <div className={`text-xs sm:text-sm font-medium ${
-                    milestone.isCompleted ? 'text-green-300 line-through' : 'text-white'
-                  }`}>
+                  <div className={`text-xs sm:text-sm font-medium ${milestone.isCompleted ? 'text-green-300 line-through' : 'text-white'
+                    }`}>
                     {milestone.title}
                   </div>
                   <div className="text-xs text-gray-400 mt-0.5 sm:mt-1">
@@ -208,7 +204,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({
                   />
                   <input
                     type="date"
-                    value={newMilestone.targetDate.toISOString().split('T')[0]}
+                    value={getLocalDateString(newMilestone.targetDate)}
                     onChange={(e) => setNewMilestone(prev => ({ ...prev, targetDate: new Date(e.target.value) }))}
                     className="w-full bg-black/60 border border-cyan-500/30 rounded-lg px-3 py-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                     required
@@ -241,11 +237,10 @@ export const GoalCard: React.FC<GoalCardProps> = ({
       {/* Complete Goal Button */}
       <button
         onClick={() => onToggleGoalComplete(goal.id)}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-sm sm:text-base ${
-          goal.isCompleted
-            ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
-            : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-        }`}
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-sm sm:text-base ${goal.isCompleted
+          ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
+          : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+          }`}
       >
         <Flag size={14} className="sm:w-4 sm:h-4" />
         {goal.isCompleted ? 'Goal Completed!' : 'Mark as Complete'}

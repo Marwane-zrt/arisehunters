@@ -3,6 +3,7 @@ import { X, Brain, Plus, Trash2 } from 'lucide-react';
 import { SkillFormData } from '../types/skill';
 import { Category } from '../types/category';
 import { Goal } from '../types/goal';
+import { getLocalDateString } from '../utils/dateUtils';
 
 interface AddSkillModalProps {
   isOpen: boolean;
@@ -87,7 +88,7 @@ export const AddSkillModal: React.FC<AddSkillModalProps> = ({
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-xl"></div>
         <div className="relative bg-black/90 backdrop-blur-sm border border-green-500/30 rounded-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
-          
+
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
@@ -181,7 +182,7 @@ export const AddSkillModal: React.FC<AddSkillModalProps> = ({
                 </label>
                 <input
                   type="date"
-                  value={formData.startDate.toISOString().split('T')[0]}
+                  value={getLocalDateString(formData.startDate)}
                   onChange={(e) => handleInputChange('startDate', new Date(e.target.value))}
                   className="w-full bg-black/60 border border-green-500/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   required
@@ -230,7 +231,7 @@ export const AddSkillModal: React.FC<AddSkillModalProps> = ({
               <label className="block text-sm font-bold text-green-300 mb-3 uppercase tracking-wider">
                 Learning Resources
               </label>
-              
+
               {formData.resources.length > 0 && (
                 <div className="space-y-2 mb-3">
                   {formData.resources.map((resource, index) => (
@@ -277,10 +278,9 @@ export const AddSkillModal: React.FC<AddSkillModalProps> = ({
                     key={color}
                     type="button"
                     onClick={() => handleInputChange('color', color)}
-                    className={`w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 ${
-                      formData.color === color ? 'border-white scale-110 shadow-lg' : 'border-gray-600'
-                    }`}
-                    style={{ 
+                    className={`w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 ${formData.color === color ? 'border-white scale-110 shadow-lg' : 'border-gray-600'
+                      }`}
+                    style={{
                       backgroundColor: color,
                       boxShadow: formData.color === color ? `0 0 20px ${color}60` : 'none'
                     }}

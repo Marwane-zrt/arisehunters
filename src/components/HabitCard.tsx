@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check, Flame, Target, Trash2, Zap } from 'lucide-react';
 import { Habit } from '../types/habit';
+import { getLocalDateString } from '../utils/dateUtils';
 
 interface HabitCardProps {
   habit: Habit;
@@ -8,21 +9,21 @@ interface HabitCardProps {
   onDeleteHabit: (habitId: string) => void;
 }
 
-export const HabitCard: React.FC<HabitCardProps> = ({ 
-  habit, 
-  onToggleComplete, 
-  onDeleteHabit 
+export const HabitCard: React.FC<HabitCardProps> = ({
+  habit,
+  onToggleComplete,
+  onDeleteHabit
 }) => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
   const isCompletedToday = habit.completedDates.includes(today);
-  const completionRate = Math.round((habit.completedDates.length / Math.max(1, 
+  const completionRate = Math.round((habit.completedDates.length / Math.max(1,
     Math.ceil((Date.now() - habit.createdAt.getTime()) / (1000 * 60 * 60 * 24)))) * 100);
 
   return (
     <div className="relative group">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl blur-sm group-hover:blur-md transition-all"></div>
       <div className="relative bg-black/70 backdrop-blur-sm border border-blue-500/30 rounded-xl p-6 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group hover:border-blue-400/50">
-        
+
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -59,7 +60,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             </div>
             <div className="text-xl font-bold text-orange-400">{habit.streak}</div>
           </div>
-          
+
           <div className="bg-black/40 rounded-lg p-3 border border-cyan-500/20">
             <div className="flex items-center gap-2 mb-1">
               <Target className="text-cyan-400" size={16} />
@@ -83,11 +84,10 @@ export const HabitCard: React.FC<HabitCardProps> = ({
         {/* Action Button */}
         <button
           onClick={() => onToggleComplete(habit.id)}
-          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-all duration-300 uppercase tracking-wider ${
-            isCompletedToday
+          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-all duration-300 uppercase tracking-wider ${isCompletedToday
               ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 border border-green-400/30'
               : 'bg-gradient-to-r from-gray-700 to-gray-800 hover:from-blue-600 hover:to-purple-700 text-gray-200 hover:text-white border border-gray-600 hover:border-blue-500/50'
-          }`}
+            }`}
         >
           <Check size={16} />
           {isCompletedToday ? 'Quest Complete!' : 'Complete Quest'}

@@ -4,7 +4,7 @@ import { Habit, HabitFormData } from '../types/habit';
 import { Goal, GoalFormData, Milestone } from '../types/goal';
 import { Skill, SkillFormData } from '../types/skill';
 import { Category, CategoryFormData } from '../types/category';
-import { Rule, RuleFormData, RuleViolation, RuleDailyCheck } from '../types/rule';
+import { Rule, RuleFormData, RuleViolation } from '../types/rule';
 import { Routine, RoutineFormData } from '../types/routine';
 import * as db from '../lib/database';
 import * as routinesApi from '../lib/routines';
@@ -270,6 +270,18 @@ export const useSupabaseData = () => {
       }
 
       await db.deleteCategory(categoryId);
+
+      // Update active habits in database to 'General'
+      const habitsToUpdate = habits.filter(h => h.category === categoryToDelete.name);
+      for (const habit of habitsToUpdate) {
+        await db.updateHabit(habit.id, { category: 'General' } as any);
+      }
+
+      // Update goals in database to 'General'
+      const goalsToUpdate = goals.filter(g => g.category === categoryToDelete.name);
+      for (const goal of goalsToUpdate) {
+        await db.updateGoal(goal.id, { category: 'General' } as any);
+      }
 
       setHabits(prev => prev.map(habit =>
         habit.category === categoryToDelete.name

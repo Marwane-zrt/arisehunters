@@ -12,6 +12,7 @@ import { SettingsView } from './components/SettingsView';
 import { RulesView } from './components/RulesView';
 import { LeaderboardView } from './components/LeaderboardView';
 import { useSupabaseData } from './hooks/useSupabaseData';
+import { getLocalDateString } from './utils/dateUtils';
 import { Users } from 'lucide-react';
 
 type ViewType = 'habits' | 'goals' | 'skills' | 'rules' | 'analytics' | 'leaderboard' | 'settings';
@@ -93,7 +94,7 @@ function App() {
     );
   }
   const completedToday = habits.filter(habit =>
-    habit.completedDates.includes(new Date().toISOString().split('T')[0])
+    habit.completedDates.includes(getLocalDateString())
   ).length;
   const totalStreak = habits.reduce((sum, habit) => sum + habit.streak, 0);
   const totalPoints = categories.reduce((sum, category) => sum + category.points, 0);

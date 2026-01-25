@@ -1,12 +1,11 @@
 import React from 'react';
-import { BarChart3, TrendingUp, Award, History } from 'lucide-react';
+import { BarChart3, History } from 'lucide-react';
 import { Habit } from '../types/habit';
 import { Goal } from '../types/goal';
 import { Category } from '../types/category';
 import { RuleViolation } from '../types/rule';
 import { CategoryRadarChart } from './CategoryRadarChart';
 import { PointsHistoryChart } from './PointsHistoryChart';
-import { getRankFromPoints } from '../utils/rankingSystem';
 import { calculatePointsHistory } from '../utils/pointsHistory';
 import { PointsHistoryData } from '../types/pointsHistory';
 import { QuestCalendar } from './QuestCalendar';
@@ -32,7 +31,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     const loadPointsHistory = async () => {
       setHistoryLoading(true);
       try {
-        const history = await calculatePointsHistory(habits, categories);
+        const history = await calculatePointsHistory(habits);
         setPointsHistory(history);
       } catch (error) {
         console.error('Error loading points history:', error);
@@ -42,7 +41,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     };
 
     loadPointsHistory();
-  }, [habits, categories]);
+  }, [habits]);
 
   const totalCompletions = habits.reduce((sum, habit) => sum + habit.completedDates.length, 0);
   const averageStreak = habits.length > 0 ? Math.round(habits.reduce((sum, habit) => sum + habit.streak, 0) / habits.length) : 0;

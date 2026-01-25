@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { GoalFormData } from '../types/goal';
 import { Category } from '../types/category';
+import { getLocalDateString } from '../utils/dateUtils';
 
 interface AddGoalModalProps {
   isOpen: boolean;
@@ -147,7 +148,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({
             </label>
             <input
               type="date"
-              value={formData.targetDate.toISOString().split('T')[0]}
+              value={getLocalDateString(formData.targetDate)}
               onChange={(e) => handleInputChange('targetDate', new Date(e.target.value))}
               className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
@@ -211,7 +212,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({
               <div className="flex gap-2">
                 <input
                   type="date"
-                  value={newMilestone.targetDate.toISOString().split('T')[0]}
+                  value={getLocalDateString(newMilestone.targetDate)}
                   onChange={(e) => setNewMilestone(prev => ({ ...prev, targetDate: new Date(e.target.value) }))}
                   className="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />

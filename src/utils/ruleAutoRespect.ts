@@ -129,6 +129,7 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
           rulesProcessed++;
 
         } catch (error) {
+          console.error(`Error auto-processing rule ${rule.id}:`, error);
         }
       }
     }
@@ -141,6 +142,7 @@ export const checkAndUpdateRuleRespect = async (): Promise<number> => {
     return rulesProcessed;
 
   } catch (error) {
+    console.error('Error in checkAndUpdateRuleRespect:', error);
     return 0;
   }
 };

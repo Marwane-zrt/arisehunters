@@ -1,10 +1,11 @@
+import { getLocalDateString } from './dateUtils';
 import { Habit } from '../types/habit';
 
 export const loadHabits = (): Habit[] => {
   try {
     const stored = localStorage.getItem('arise-habits');
     if (!stored) return [];
-    
+
     const habits = JSON.parse(stored);
     return habits.map((habit: any) => ({
       ...habit,
@@ -17,5 +18,5 @@ export const loadHabits = (): Habit[] => {
 };
 
 export const getTodayString = (): string => {
-  return new Date().toISOString().split('T')[0];
+  return getLocalDateString();
 };

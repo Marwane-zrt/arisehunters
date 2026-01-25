@@ -18,3 +18,37 @@ export const calculateGoalProgress = (goal: { milestones: { isCompleted: boolean
   const completedCount = goal.milestones.filter(m => m.isCompleted).length;
   return Math.round((completedCount / goal.milestones.length) * 100);
 };
+
+/**
+ * Returns the number of days until a given deadline.
+ */
+export const getDaysUntilDeadline = (targetDate: Date): number => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(targetDate);
+  deadline.setHours(0, 0, 0, 0);
+
+  const diffTime = deadline.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+/**
+ * Checks if a date has passed.
+ */
+export const isOverdue = (targetDate: Date): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(targetDate);
+  deadline.setHours(0, 0, 0, 0);
+  return deadline < today;
+};
+
+/**
+ * Creates a Date object from a YYYY-MM-DD string in local time.
+ * Standard `new Date("YYYY-MM-DD")` is often UTC, which causes bugs.
+ */
+export const parseLocalDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  // months are 0-indexed in JS
+  return new Date(year, month - 1, day);
+};

@@ -4,16 +4,19 @@ import { UserMenu } from './components/UserMenu';
 import FriendsModal from './components/FriendsModal';
 import Header from './components/Header';
 import { Navigation } from './components/Navigation';
-import { HabitsView } from './components/HabitsView';
-import { GoalsView } from './components/GoalsView';
-import { AnalyticsView } from './components/AnalyticsView';
-import { SkillsView } from './components/SkillsView';
-import { SettingsView } from './components/SettingsView';
-import { RulesView } from './components/RulesView';
-import { LeaderboardView } from './components/LeaderboardView';
+import { Suspense, lazy } from 'react';
 import { useSupabaseData } from './hooks/useSupabaseData';
 import { getLocalDateString } from './utils/dateUtils';
-import { Users } from 'lucide-react';
+import { Users, Loader2 } from 'lucide-react';
+
+// Lazy load views for better performance
+const HabitsView = lazy(() => import('./components/HabitsView').then(m => ({ default: m.HabitsView })));
+const GoalsView = lazy(() => import('./components/GoalsView').then(m => ({ default: m.GoalsView })));
+const AnalyticsView = lazy(() => import('./components/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
+const SkillsView = lazy(() => import('./components/SkillsView').then(m => ({ default: m.SkillsView })));
+const SettingsView = lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
+const RulesView = lazy(() => import('./components/RulesView').then(m => ({ default: m.RulesView })));
+const LeaderboardView = lazy(() => import('./components/LeaderboardView').then(m => ({ default: m.LeaderboardView })));
 
 type ViewType = 'habits' | 'goals' | 'skills' | 'rules' | 'analytics' | 'leaderboard' | 'settings';
 
@@ -189,6 +192,12 @@ function App() {
     }
   };
 
+  const PageLoader = () => (
+    <div className="flex justify-center items-center py-20">
+      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+    </div>
+  );
+
   return (
     <AuthWrapper>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-hidden">
@@ -235,7 +244,9 @@ function App() {
           />
 
           <main className="pb-8">
-            {renderCurrentView()}
+            <Suspense fallback={<PageLoader />}>
+              {renderCurrentView()}
+            </Suspense>
           </main>
 
           {/* Friends Modal */}

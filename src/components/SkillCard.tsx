@@ -53,14 +53,14 @@ export const SkillCard: React.FC<SkillCardProps> = ({
 
   const handleStatusChange = (newStatus: 'Learning' | 'Learned' | 'Mastered') => {
     const updates: Partial<Skill> = { status: newStatus };
-    
+
     if (newStatus === 'Learned' || newStatus === 'Mastered') {
       updates.completedDate = new Date();
       updates.progress = 100;
     } else {
       updates.completedDate = undefined;
     }
-    
+
     onUpdateSkill(skill.id, updates);
   };
 
@@ -70,7 +70,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
   };
 
   const handleGoalUpdate = () => {
-    onUpdateSkill(skill.id, { linkedGoalId: selectedGoalId || undefined });
+    onUpdateSkill(skill.id, { linkedGoalId: selectedGoalId });
     setIsEditingGoal(false);
   };
 
@@ -83,7 +83,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
     <div className="relative group">
       <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl blur-sm group-hover:blur-md transition-all"></div>
       <div className="relative bg-black/70 backdrop-blur-sm border border-green-500/30 rounded-xl p-4 sm:p-6 shadow-2xl hover:shadow-green-500/10 transition-all duration-300 group hover:border-green-400/50">
-        
+
         {/* Header */}
         <div className="flex items-start justify-between mb-3 sm:mb-4">
           <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
@@ -145,7 +145,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
               )}
             </div>
           </div>
-          
+
           {isEditing ? (
             <div className="flex items-center gap-2 text-xs sm:text-sm">
               <input
@@ -219,7 +219,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
               <Edit size={10} className="sm:w-3 sm:h-3" />
             </button>
           </div>
-          
+
           {isEditingGoal ? (
             <div className="space-y-2 text-xs sm:text-sm">
               <select
@@ -258,9 +258,8 @@ export const SkillCard: React.FC<SkillCardProps> = ({
                     style={{ backgroundColor: linkedGoal.color }}
                   />
                   <span className="text-purple-300 text-xs sm:text-sm font-medium truncate flex-1">{linkedGoal.title}</span>
-                  <span className={`text-xs px-1 sm:px-2 py-1 rounded flex-shrink-0 ${
-                    linkedGoal.isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
-                  }`}>
+                  <span className={`text-xs px-1 sm:px-2 py-1 rounded flex-shrink-0 ${linkedGoal.isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+                    }`}>
                     {linkedGoal.isCompleted ? 'Completed' : 'In Progress'}
                   </span>
                 </div>
@@ -289,7 +288,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
               </button>
             </>
           )}
-          
+
           {skill.status === 'Learned' && (
             <button
               onClick={() => handleStatusChange('Mastered')}
@@ -298,7 +297,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
               Mark as Mastered
             </button>
           )}
-          
+
           {skill.status === 'Mastered' && (
             <div className="w-full bg-purple-500/20 border border-purple-500/30 text-purple-400 py-2 rounded-lg font-medium text-center">
               Skill Mastered! 🏆

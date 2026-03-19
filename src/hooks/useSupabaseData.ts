@@ -578,9 +578,10 @@ export const useSupabaseData = () => {
       const updatedSkills = [...skills, newSkill];
       setSkills(updatedSkills);
       updateCache('skills', updatedSkills);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding skill:', err);
-      setError('Failed to add skill');
+      const errorMsg = err.message || err.error_description || (typeof err === 'string' ? err : JSON.stringify(err));
+      setError(`Failed to add skill: ${errorMsg}`);
     }
   };
 

@@ -408,22 +408,37 @@ export const fetchSkills = async (): Promise<Skill[]> => {
 };
 
 export const createSkill = async (skillData: SkillFormData): Promise<Skill> => {
+  const userResponse = await supabase.auth.getUser();
+  const userId = userResponse.data.user?.id;
+
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
+  const payload: any = {
+    name: skillData.name,
+    category: skillData.category || '',
+    level: skillData.level,
+    status: skillData.status,
+    description: skillData.description || '',
+    start_date: getLocalDateString(skillData.startDate),
+    resources: skillData.resources || [],
+    color: skillData.color,
+    progress: skillData.status === 'Mastered' ? 100 : skillData.status === 'Learned' ? 100 : 0,
+    user_id: userId
+  };
+
+  if (skillData.status !== 'Learning') {
+    payload.completed_date = new Date().toISOString();
+  }
+
+  if (skillData.linkedGoalId) {
+    payload.linked_goal_id = skillData.linkedGoalId;
+  }
+
   const { data, error } = await supabase
     .from('skills')
-    .insert({
-      name: skillData.name,
-      category: skillData.category,
-      level: skillData.level,
-      status: skillData.status,
-      description: skillData.description,
-      start_date: getLocalDateString(skillData.startDate),
-      resources: skillData.resources,
-      color: skillData.color,
-      progress: skillData.status === 'Mastered' ? 100 : skillData.status === 'Learned' ? 100 : 0,
-      completed_date: skillData.status !== 'Learning' ? new Date().toISOString() : null,
-      linked_goal_id: skillData.linkedGoalId,
-      user_id: (await supabase.auth.getUser()).data.user?.id
-    })
+    .insert(payload)
     .select()
     .single();
 
@@ -457,7 +472,12 @@ export const updateSkill = async (skillId: string, updates: Partial<Skill>): Pro
   if (updates.completedDate !== undefined) updateData.completed_date = updates.completedDate?.toISOString();
   if (updates.resources !== undefined) updateData.resources = updates.resources;
   if (updates.description !== undefined) updateData.description = updates.description;
-  if (updates.linkedGoalId !== undefined) updateData.linked_goal_id = updates.linkedGoalId;
+  if (updates.linkedGoalId !== undefined && updates.linkedGoalId !== '') {
+    updateData.linked_goal_id = updates.linkedGoalId;
+  } else if (updates.linkedGoalId === '') {
+    // Attempting to clear the goal, safely setting it to null
+    updateData.linked_goal_id = null;
+  }
 
   const { error } = await supabase
     .from('skills')

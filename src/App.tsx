@@ -88,10 +88,18 @@ function App() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-400 text-xl font-bold mb-4">Error Loading Data</div>
-          <p className="text-gray-400">{error}</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center p-4">
+        <div className="text-center max-w-md w-full bg-black/40 backdrop-blur-md border border-red-500/30 p-8 rounded-2xl shadow-2xl">
+          <div className="text-red-400 text-2xl font-bold mb-4">System Error</div>
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+            <p className="text-gray-300 text-sm font-mono break-all">{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg uppercase tracking-wider text-sm"
+          >
+            Reset System
+          </button>
         </div>
       </div>
     );

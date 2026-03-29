@@ -8,6 +8,7 @@ import { Suspense, lazy } from 'react';
 import { useSupabaseData } from './hooks/useSupabaseData';
 import { getLocalDateString } from './utils/dateUtils';
 import { Users, Loader2 } from 'lucide-react';
+import { VoiceflowWidget } from './components/VoiceflowWidget';
 
 // Lazy load views for better performance
 const HabitsView = lazy(() => import('./components/HabitsView').then(m => ({ default: m.HabitsView })));
@@ -208,6 +209,9 @@ function App() {
 
   return (
     <AuthWrapper>
+      {/* Voiceflow Chatbot - only active after login/signup */}
+      <VoiceflowWidget />
+
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

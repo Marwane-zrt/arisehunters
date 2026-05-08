@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Connexion - Arise Hunter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white text-center py-3">
+                <h4 class="mb-0">Connexion</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">Nom d'utilisateur</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label fw-bold">Mot de passe</label>
+                        {{ form.password }}
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger p-2 small">
+                            Identifiant ou mot de passe incorrect.
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 mt-3">Se connecter</button>
+                    <!-- Permet la redirection native de Django -->
+                    <input type="hidden" name="next" value="{{ request.GET.next|default:'profile' }}">
+                </form>
+            </div>
+            <div class="card-footer text-center py-3 bg-light">
+                <small class="text-muted">Pas encore membre ? <a href="{% url 'register' %}" class="fw-bold">Inscrivez-vous ici</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

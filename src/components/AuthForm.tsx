@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, Swords, Shield, Zap, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Swords, Shield, Zap, AlertCircle, Hexagon, Github } from 'lucide-react';
 import { LoginFormData, SignupFormData } from '../types/auth';
 
 interface AuthFormProps {
@@ -181,6 +181,22 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 </div>
               )}
 
+              {/* Extra Login Options */}
+              {!isSignup && (
+                <div className="flex items-center justify-between text-sm px-1">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-blue-500/30 bg-black/60 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-black cursor-pointer"
+                    />
+                    <span className="text-gray-400 group-hover:text-blue-300 transition-colors font-medium tracking-wide">Remember me</span>
+                  </label>
+                  <button type="button" className="text-blue-400 hover:text-blue-300 transition-colors font-medium tracking-wide">
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -200,6 +216,29 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 </div>
               </button>
             </form>
+
+            {/* Social Logins */}
+            <div className="mt-8">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-blue-500/20"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-transparent text-gray-500 uppercase tracking-widest text-xs font-bold">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 gap-4">
+                <button type="button" className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-blue-500/20 rounded-lg text-gray-400 hover:bg-blue-900/20 hover:border-blue-500/50 hover:text-white transition-all group shadow-lg hover:shadow-blue-500/20">
+                  <Hexagon size={18} className="text-blue-500 group-hover:text-blue-400 transition-colors" />
+                  <span className="text-sm font-bold tracking-wider">DISCORD</span>
+                </button>
+                <button type="button" className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-purple-500/20 rounded-lg text-gray-400 hover:bg-purple-900/20 hover:border-purple-500/50 hover:text-white transition-all group shadow-lg hover:shadow-purple-500/20">
+                  <Github size={18} className="text-purple-500 group-hover:text-purple-400 transition-colors" />
+                  <span className="text-sm font-bold tracking-wider">GITHUB</span>
+                </button>
+              </div>
+            </div>
 
             {/* Mode Switch */}
             <div className="mt-8 text-center">

@@ -1,0 +1,21 @@
+<div class="card h-100 shadow movie-card text-decoration-none">
+    <div class="card-body d-flex flex-column">
+        <h5 class="card-title fw-bold text-white mb-1">{{ movie.title }}</h5>
+        <div class="text-primary small mb-3 d-flex justify-content-between">
+            <span>{{ movie.year|default:"N/A" }}</span>
+            <span>{{ movie.country|default:"" }}</span>
+        </div>
+        
+        <p class="card-text text-muted flex-grow-1 line-clamp" style="font-size: 0.9rem;">
+            {{ movie.synopsis|truncatewords:20|default:"Aucun synopsis fourni." }}
+        </p>
+        
+        <div class="mb-3 d-flex flex-wrap gap-2">
+            {% for genre in movie.genres.all|slice:":2" %}
+                <span class="badge border border-dark text-muted fw-normal">{{ genre.name }}</span>
+            {% endfor %}
+        </div>
+        
+        <a href="{% url 'movie_detail' movie.pk %}" class="btn btn-outline-primary btn-sm w-100 mt-auto text-uppercase tracking-wide"><i class="bi bi-film"></i> Découvrir</a>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, Swords, Shield, Zap, AlertCircle, Hexagon, Github } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Swords, Shield, Zap, AlertCircle } from 'lucide-react';
 import { LoginFormData, SignupFormData } from '../types/auth';
 
 interface AuthFormProps {
@@ -43,74 +43,76 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const passwordsMatch = formData.password === formData.confirmPassword;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#050810] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-3/4 left-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-3/4 left-1/2 w-64 h-64 bg-cyan-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '4s' }}></div>
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20"></div>
       </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Glowing Border Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20 rounded-2xl blur-xl"></div>
+      <div className="relative w-full max-w-md z-10">
+        {/* Glowing Border Effect behind the card */}
+        <div className="absolute -inset-0.5 bg-gradient-to-br from-blue-500/30 via-purple-500/20 to-cyan-500/30 rounded-[2rem] blur-xl opacity-75 animate-pulse"></div>
         
-        <div className="relative bg-black/80 backdrop-blur-sm border border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="relative bg-[#0B0F19]/90 backdrop-blur-2xl border border-white/5 rounded-[2rem] shadow-2xl overflow-hidden p-8 sm:p-10">
+          
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-8 text-center border-b border-blue-500/20">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-blue-500 rounded-xl blur-lg opacity-50"></div>
-                <div className="relative p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
-                  <Swords className="text-white" size={32} />
+          <div className="text-center mb-10">
+            {/* Logo */}
+            <div className="flex justify-center mb-6">
+              <div className="relative group cursor-default">
+                <div className="absolute inset-0 bg-blue-500 rounded-2xl blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-500"></div>
+                <div className="relative p-4 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-2xl border border-blue-400/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
+                  <Swords className="text-white drop-shadow-md" size={36} strokeWidth={1.5} />
                 </div>
               </div>
             </div>
             
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-2 tracking-wider">
+            <h1 className="text-4xl font-black bg-gradient-to-br from-white via-blue-100 to-blue-400 bg-clip-text text-transparent mb-1 tracking-widest drop-shadow-sm">
               ARISE
             </h1>
-            <p className="text-blue-300 text-sm font-medium tracking-widest uppercase">
+            <p className="text-blue-500/80 text-[10px] font-bold tracking-[0.3em] uppercase mb-8">
               Hunter System
             </p>
             
-            <div className="mt-6">
-              <h2 className="text-xl font-bold text-white mb-2">
-                {isSignup ? 'Join the Guild' : 'Welcome Back, Hunter'}
-              </h2>
-              <p className="text-gray-400 text-sm">
-                {isSignup 
-                  ? 'Begin your journey to become the strongest hunter'
-                  : 'Continue your path to greatness'
-                }
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold text-white mb-2 tracking-wide">
+              {isSignup ? 'Join the Guild' : 'Welcome Back, Hunter'}
+            </h2>
+            <p className="text-gray-400 text-sm font-medium">
+              {isSignup 
+                ? 'Begin your journey to become the strongest hunter'
+                : 'Continue your path to greatness'
+              }
+            </p>
           </div>
 
           {/* Form */}
-          <div className="p-8">
+          <div className="">
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-3">
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
                 <AlertCircle className="text-red-400 flex-shrink-0" size={20} />
-                <p className="text-red-400 text-sm">{error}</p>
+                <p className="text-red-400 text-sm font-medium">{error}</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email Field */}
-              <div>
-                <label className="block text-sm font-bold text-blue-300 mb-3 uppercase tracking-wider">
+              <div className="group">
+                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider group-focus-within:text-blue-400 transition-colors">
                   Hunter Email
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="text-gray-400" size={20} />
+                    <Mail className="text-gray-500 group-focus-within:text-blue-400 transition-colors" size={18} />
                   </div>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full bg-black/60 border border-blue-500/30 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#151A2D]/50 border border-white/5 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-[#151A2D] transition-all"
                     placeholder="hunter@arise.com"
                     required
                   />
@@ -118,19 +120,19 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               </div>
 
               {/* Password Field */}
-              <div>
-                <label className="block text-sm font-bold text-blue-300 mb-3 uppercase tracking-wider">
+              <div className="group">
+                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider group-focus-within:text-blue-400 transition-colors">
                   Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="text-gray-400" size={20} />
+                    <Lock className="text-gray-500 group-focus-within:text-blue-400 transition-colors" size={18} />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="w-full bg-black/60 border border-blue-500/30 rounded-lg pl-12 pr-12 py-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#151A2D]/50 border border-white/5 rounded-xl pl-11 pr-12 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-[#151A2D] transition-all"
                     placeholder="Enter your password"
                     required
                     minLength={6}
@@ -138,31 +140,31 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors"
                   >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
               {/* Confirm Password Field (Signup only) */}
               {isSignup && (
-                <div>
-                  <label className="block text-sm font-bold text-blue-300 mb-3 uppercase tracking-wider">
+                <div className="group animate-in fade-in slide-in-from-top-2">
+                  <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider group-focus-within:text-blue-400 transition-colors">
                     Confirm Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Shield className="text-gray-400" size={20} />
+                      <Shield className="text-gray-500 group-focus-within:text-blue-400 transition-colors" size={18} />
                     </div>
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className={`w-full bg-black/60 border rounded-lg pl-12 pr-12 py-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                      className={`w-full bg-[#151A2D]/50 border rounded-xl pl-11 pr-12 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:bg-[#151A2D] transition-all ${
                         formData.confirmPassword && !passwordsMatch
-                          ? 'border-red-500/50 focus:ring-red-500'
-                          : 'border-blue-500/30 focus:ring-blue-500'
+                          ? 'border-red-500/30 focus:ring-red-500/50 focus:border-red-500/50'
+                          : 'border-white/5 focus:ring-blue-500/50 focus:border-blue-500/50'
                       }`}
                       placeholder="Confirm your password"
                       required
@@ -170,30 +172,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors"
                     >
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                   {formData.confirmPassword && !passwordsMatch && (
-                    <p className="mt-2 text-red-400 text-sm">Passwords do not match</p>
+                    <p className="mt-2 text-red-400 text-xs font-medium pl-1">Passwords do not match</p>
                   )}
-                </div>
-              )}
-
-              {/* Extra Login Options */}
-              {!isSignup && (
-                <div className="flex items-center justify-between text-sm px-1">
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input 
-                      type="checkbox" 
-                      className="w-4 h-4 rounded border-blue-500/30 bg-black/60 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-black cursor-pointer"
-                    />
-                    <span className="text-gray-400 group-hover:text-blue-300 transition-colors font-medium tracking-wide">Remember me</span>
-                  </label>
-                  <button type="button" className="text-blue-400 hover:text-blue-300 transition-colors font-medium tracking-wide">
-                    Forgot password?
-                  </button>
                 </div>
               )}
 
@@ -201,53 +187,30 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               <button
                 type="submit"
                 disabled={loading || (isSignup && !passwordsMatch)}
-                className="w-full relative group"
+                className="w-full relative group mt-8"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
-                <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-bold py-4 rounded-lg transition-all shadow-lg border border-blue-400/30 uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <div className="absolute inset-0 bg-blue-500 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-300"></div>
+                <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] border border-blue-500/30 uppercase tracking-widest text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group-hover:scale-[1.02] active:scale-[0.98]">
                   {loading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div>
                   ) : (
                     <>
-                      <Zap size={20} />
-                      {isSignup ? 'Awaken as Hunter' : 'Enter the System'}
+                      <Zap size={18} className="text-blue-200" />
+                      <span className="drop-shadow-md">{isSignup ? 'Awaken as Hunter' : 'Enter the System'}</span>
                     </>
                   )}
                 </div>
               </button>
             </form>
 
-            {/* Social Logins */}
-            <div className="mt-8">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-blue-500/20"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-transparent text-gray-500 uppercase tracking-widest text-xs font-bold">Or continue with</span>
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <button type="button" className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-blue-500/20 rounded-lg text-gray-400 hover:bg-blue-900/20 hover:border-blue-500/50 hover:text-white transition-all group shadow-lg hover:shadow-blue-500/20">
-                  <Hexagon size={18} className="text-blue-500 group-hover:text-blue-400 transition-colors" />
-                  <span className="text-sm font-bold tracking-wider">DISCORD</span>
-                </button>
-                <button type="button" className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-purple-500/20 rounded-lg text-gray-400 hover:bg-purple-900/20 hover:border-purple-500/50 hover:text-white transition-all group shadow-lg hover:shadow-purple-500/20">
-                  <Github size={18} className="text-purple-500 group-hover:text-purple-400 transition-colors" />
-                  <span className="text-sm font-bold tracking-wider">GITHUB</span>
-                </button>
-              </div>
-            </div>
-
             {/* Mode Switch */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-400 text-sm mb-4">
-                {isSignup ? 'Already a registered hunter?' : 'New to the Hunter System?'}
+            <div className="mt-10 text-center relative z-10">
+              <p className="text-gray-500 text-xs font-medium mb-3">
+                {isSignup ? 'ALREADY A REGISTERED HUNTER?' : 'NEW TO THE HUNTER SYSTEM?'}
               </p>
               <button
                 onClick={() => onModeChange(isSignup ? 'login' : 'signup')}
-                className="text-blue-400 hover:text-blue-300 font-medium transition-colors uppercase tracking-wider"
+                className="text-blue-400 hover:text-white font-bold transition-colors uppercase tracking-wider text-sm px-4 py-2 rounded-lg hover:bg-blue-500/10"
               >
                 {isSignup ? 'Sign In to Your Account' : 'Create Hunter Account'}
               </button>

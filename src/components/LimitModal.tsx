@@ -1,7 +1,7 @@
 import React from 'react';
-import { X, AlertTriangle, ShieldAlert, Zap } from 'lucide-react';
+import { X, AlertTriangle, ShieldAlert, Zap, Target, Lock } from 'lucide-react';
 
-export type LimitType = 'HABITS' | 'GOALS' | 'RULES' | 'RANK_GATE';
+export type LimitType = 'HABITS' | 'GOALS' | 'RULES' | 'RANK_GATE' | 'LEADERBOARD';
 
 interface LimitModalProps {
   isOpen: boolean;
@@ -25,12 +25,12 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type })
         };
       case 'GOALS':
         return {
-          title: 'SYSTEM ALERT: CAPACITY REACHED',
-          message: 'Your current rank restricts you to 3 active long-term goals. To conquer more objectives, you must unlock your hidden potential.',
-          icon: <AlertTriangle className="text-orange-400 w-12 h-12" />,
-          color: 'from-orange-500 to-red-600',
-          borderColor: 'border-orange-500/50',
-          bgGlow: 'bg-orange-500/20'
+          title: 'GOAL LIMIT REACHED',
+          message: 'E-Rank Hunters are restricted to 2 active long-term goals. To take on more Raids, you must reach C-Rank and join the Hunter Guild.',
+          icon: <Target className="text-pink-500 w-12 h-12" />,
+          color: 'from-pink-500 to-purple-600',
+          borderColor: 'border-pink-500/50',
+          bgGlow: 'bg-pink-500/20'
         };
       case 'RULES':
         return {
@@ -49,6 +49,15 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type })
           color: 'from-red-600 to-black',
           borderColor: 'border-red-600/50',
           bgGlow: 'bg-red-600/20'
+        };
+      case 'LEADERBOARD':
+        return {
+          title: 'SYSTEM LOCKED',
+          message: 'The Global Leaderboard is locked for E-Rank and D-Rank Hunters. To see how you rank against the strongest, you must ascend to C-Rank.',
+          icon: <Lock className="text-yellow-500 w-12 h-12" />,
+          color: 'from-yellow-500 to-orange-600',
+          borderColor: 'border-yellow-500/50',
+          bgGlow: 'bg-yellow-500/20'
         };
     }
   };

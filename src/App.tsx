@@ -131,6 +131,17 @@ function App() {
     }
   };
 
+  const handleViewChange = (view: any) => {
+    if (view === 'leaderboard') {
+      const currentRank = getRankFromPoints(totalPoints).rank;
+      if (currentRank === 'E' || currentRank === 'D') {
+        setLimitModalConfig({ isOpen: true, type: 'LEADERBOARD' });
+        return;
+      }
+    }
+    setCurrentView(view);
+  };
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'habits':
@@ -264,7 +275,7 @@ function App() {
 
           <Navigation
             currentView={currentView}
-            onViewChange={setCurrentView}
+            onViewChange={handleViewChange}
             onGuildClick={handleGuildClick}
           />
 

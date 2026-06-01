@@ -48,13 +48,14 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddRoutineModalOpen, setIsAddRoutineModalOpen] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
-  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'HABITS' });
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType, limitValue?: number}>({ isOpen: false, type: 'HABITS' });
 
   const today = getLocalDateString();
+  const maxStamina = getRankFromPoints(totalPoints).stamina;
 
   const handleAddQuestClick = () => {
-    if (habits.length >= 7) {
-      setLimitModalConfig({ isOpen: true, type: 'HABITS' });
+    if (habits.length >= maxStamina) {
+      setLimitModalConfig({ isOpen: true, type: 'HABITS', limitValue: maxStamina });
     } else {
       setIsAddModalOpen(true);
     }
@@ -73,8 +74,6 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
     setIsAddRoutineModalOpen(false);
     setEditingRoutine(null);
   };
-
-  const maxStamina = getRankFromPoints(totalPoints).stamina;
 
   const handleToggleCompleteWrapper = (habitId: string) => {
     const habit = habits.find(h => h.id === habitId);
@@ -238,10 +237,11 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
       />
 
       {/* Limit Modal */}
-      <LimitModal
+      <LimitModal 
         isOpen={limitModalConfig.isOpen}
         onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
         type={limitModalConfig.type}
+        limitValue={limitModalConfig.limitValue}
       />
     </div>
   );

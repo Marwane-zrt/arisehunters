@@ -7,9 +7,10 @@ interface LimitModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: LimitType;
+  limitValue?: number;
 }
 
-export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type }) => {
+export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type, limitValue }) => {
   if (!isOpen) return null;
 
   const getContent = () => {
@@ -17,7 +18,7 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type })
       case 'HABITS':
         return {
           title: 'SYSTEM ALERT: CAPACITY REACHED',
-          message: 'E-Rank Hunters lack the stamina to track more than 7 active quests simultaneously. To break your limits and unlock unlimited tracking, ascend to a higher rank.',
+          message: `Your current Rank lacks the stamina to track more than ${limitValue || 7} active quests simultaneously. To break your limits and unlock unlimited tracking, ascend to a higher rank.`,
           icon: <AlertTriangle className="text-orange-400 w-12 h-12" />,
           color: 'from-orange-500 to-red-600',
           borderColor: 'border-orange-500/50',

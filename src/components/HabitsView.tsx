@@ -79,14 +79,17 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
     
-    const isAlreadyCompleted = habit.completedDates.includes(today);
+    const isCompleted = habit.completedDates.includes(today);
+
+    // TEMPORARY TESTING FLAG: Disable stamina limit
+    const TEST_MODE_DISABLE_STAMINA = true;
+
+    if (!TEST_MODE_DISABLE_STAMINA && !isCompleted && staminaSpent >= maxStamina) {
+      setLimitModalConfig({ isOpen: true, type: 'STAMINA', limitValue: maxStamina });
+      return;
+    }
     
-    if (!isAlreadyCompleted) {
-      if (staminaSpent >= maxStamina) {
-        setLimitModalConfig({ isOpen: true, type: 'STAMINA' });
-        return;
-      }
-      
+    if (!isCompleted) {
       // Permanently consume stamina in database
       consumeStamina();
     }

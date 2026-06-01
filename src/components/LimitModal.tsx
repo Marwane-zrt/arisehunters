@@ -27,7 +27,7 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type, l
       case 'GOALS':
         return {
           title: 'GOAL LIMIT REACHED',
-          message: 'E-Rank Hunters are restricted to 1 active long-term goal. To take on more Raids, you must reach C-Rank and join the Hunter Guild.',
+          message: `Your current Rank lacks the capacity to track more than ${limitValue || 1} active long-term goal${limitValue !== 1 ? 's' : ''}. Ascend to a higher rank to unlock more slots.`,
           icon: <Target className="text-pink-500 w-12 h-12" />,
           color: 'from-pink-500 to-purple-600',
           borderColor: 'border-pink-500/50',
@@ -36,7 +36,7 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type, l
       case 'RULES':
         return {
           title: 'SYSTEM ALERT: CAPACITY REACHED',
-          message: 'A weak vessel cannot handle the burden of more than 3 strict rules. Build your discipline and ascend your rank to enforce more penalties.',
+          message: `A weak vessel cannot handle the burden of more than ${limitValue || 3} strict rules. Build your discipline and ascend your rank to enforce more penalties.`,
           icon: <AlertTriangle className="text-orange-400 w-12 h-12" />,
           color: 'from-orange-500 to-red-600',
           borderColor: 'border-orange-500/50',
@@ -45,7 +45,7 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type, l
       case 'SKILLS':
         return {
           title: 'SYSTEM ALERT: SKILL SLOTS FULL',
-          message: 'E-Rank Hunters can only focus on mastering 3 skills at a time. To expand your learning capacity, ascend to a higher rank.',
+          message: `Your current Rank can only focus on mastering ${limitValue || 3} skills at a time. To expand your learning capacity, ascend to a higher rank.`,
           icon: <AlertTriangle className="text-orange-400 w-12 h-12" />,
           color: 'from-orange-500 to-red-600',
           borderColor: 'border-orange-500/50',

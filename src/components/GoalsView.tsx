@@ -6,6 +6,7 @@ import { GoalCard } from './GoalCard';
 import { AddGoalModal } from './AddGoalModal';
 import { LimitModal, LimitType } from './LimitModal';
 import { getDaysUntilDeadline, isOverdue } from '../utils/dateUtils';
+import { getRankFromPoints } from '../utils/rankingSystem';
 
 interface GoalsViewProps {
   goals: Goal[];
@@ -16,6 +17,7 @@ interface GoalsViewProps {
   onDeleteGoal: (goalId: string) => void;
   onAddMilestone: (goalId: string, milestone: Omit<Milestone, 'id' | 'isCompleted' | 'completedDate'>) => void;
   onDeleteMilestone: (goalId: string, milestoneId: string) => void;
+  totalPoints: number;
 }
 
 export const GoalsView: React.FC<GoalsViewProps> = ({
@@ -27,15 +29,17 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
   onDeleteGoal,
   onAddMilestone,
   onDeleteMilestone,
+  totalPoints
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'GOALS' });
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType, limitValue?: number}>({ isOpen: false, type: 'GOALS' });
 
   const activeGoals = goals.filter(goal => !goal.isCompleted);
+  const maxGoals = getRankFromPoints(totalPoints).maxGoals;
   
   const handleAddGoalClick = () => {
-    if (activeGoals.length >= 1) {
-      setLimitModalConfig({ isOpen: true, type: 'GOALS' });
+    if (activeGoals.length >= maxGoals) {
+      setLimitModalConfig({ isOpen: true, type: 'GOALS', limitValue: maxGoals });
     } else {
       setIsAddModalOpen(true);
     }
@@ -190,6 +194,7 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
         isOpen={limitModalConfig.isOpen}
         onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
         type={limitModalConfig.type}
+        limitValue={limitModalConfig.limitValue}
       />
     </div>
   );

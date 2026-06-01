@@ -6,6 +6,7 @@ import { RuleCard } from './RuleCard';
 import { AddRuleModal } from './AddRuleModal';
 import { LimitModal, LimitType } from './LimitModal';
 import { getTodayString } from '../utils/storage';
+import { getRankFromPoints } from '../utils/rankingSystem';
 
 interface RulesViewProps {
   rules: Rule[];
@@ -17,6 +18,7 @@ interface RulesViewProps {
   onDeleteViolation: (violationId: string) => void;
   onToggleRuleActive: (ruleId: string) => void;
   getRuleViolations: (ruleId: string) => RuleViolation[];
+  totalPoints: number;
 }
 
 export const RulesView: React.FC<RulesViewProps> = ({
@@ -28,16 +30,18 @@ export const RulesView: React.FC<RulesViewProps> = ({
   onDeleteRule,
   onDeleteViolation,
   onToggleRuleActive,
-  getRuleViolations
+  getRuleViolations,
+  totalPoints
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'RULES' });
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType, limitValue?: number}>({ isOpen: false, type: 'RULES' });
 
   const activeRules = rules.filter(rule => rule.isActive);
+  const maxRules = getRankFromPoints(totalPoints).maxRules;
 
   const handleAddRuleClick = () => {
-    if (activeRules.length >= 3) {
-      setLimitModalConfig({ isOpen: true, type: 'RULES' });
+    if (activeRules.length >= maxRules) {
+      setLimitModalConfig({ isOpen: true, type: 'RULES', limitValue: maxRules });
     } else {
       setIsAddModalOpen(true);
     }
@@ -233,6 +237,7 @@ export const RulesView: React.FC<RulesViewProps> = ({
         isOpen={limitModalConfig.isOpen}
         onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
         type={limitModalConfig.type}
+        limitValue={limitModalConfig.limitValue}
       />
     </div>
   );

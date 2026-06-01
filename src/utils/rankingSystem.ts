@@ -6,16 +6,19 @@ export interface RankInfo {
   minPoints: number;
   maxPoints: number;
   stamina: number;
+  maxGoals: number;
+  maxSkills: number;
+  maxRules: number;
   description: string;
 }
 
 export const RANK_THRESHOLDS: RankInfo[] = [
-  { rank: 'E', color: '#6B7280', minPoints: 0, maxPoints: 24, stamina: 6, description: 'Novice Hunter' },
-  { rank: 'D', color: '#EF4444', minPoints: 25, maxPoints: 74, stamina: 7, description: 'Awakened Hunter' },
-  { rank: 'C', color: '#F97316', minPoints: 75, maxPoints: 149, stamina: 8, description: 'Elite Hunter' },
-  { rank: 'B', color: '#EAB308', minPoints: 150, maxPoints: 299, stamina: 10, description: 'Master Hunter' },
-  { rank: 'A', color: '#22C55E', minPoints: 300, maxPoints: 499, stamina: 12, description: 'Shadow Hunter' },
-  { rank: 'S', color: '#8B5CF6', minPoints: 500, maxPoints: Infinity, stamina: 15, description: 'Sovereign Hunter' },
+  { rank: 'E', color: '#6B7280', minPoints: 0, maxPoints: 24, stamina: 6, maxGoals: 1, maxSkills: 3, maxRules: 3, description: 'Novice Hunter' },
+  { rank: 'D', color: '#EF4444', minPoints: 25, maxPoints: 74, stamina: 7, maxGoals: 2, maxSkills: 4, maxRules: 4, description: 'Awakened Hunter' },
+  { rank: 'C', color: '#F97316', minPoints: 75, maxPoints: 149, stamina: 8, maxGoals: 3, maxSkills: 6, maxRules: 5, description: 'Elite Hunter' },
+  { rank: 'B', color: '#EAB308', minPoints: 150, maxPoints: 299, stamina: 10, maxGoals: 5, maxSkills: 8, maxRules: 7, description: 'Master Hunter' },
+  { rank: 'A', color: '#22C55E', minPoints: 300, maxPoints: 499, stamina: 12, maxGoals: 8, maxSkills: 10, maxRules: 10, description: 'Shadow Hunter' },
+  { rank: 'S', color: '#8B5CF6', minPoints: 500, maxPoints: Infinity, stamina: 15, maxGoals: 99, maxSkills: 99, maxRules: 99, description: 'Sovereign Hunter' },
 ];
 
 export const getRankFromPoints = (points: number): RankInfo => {

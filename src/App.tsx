@@ -176,6 +176,7 @@ function App() {
             onDeleteGoal={deleteGoal}
             onAddMilestone={addMilestone}
             onDeleteMilestone={deleteMilestone}
+            totalPoints={totalPoints}
           />
         );
       case 'skills':
@@ -187,6 +188,7 @@ function App() {
             onAddSkill={addSkill}
             onUpdateSkill={updateSkill}
             onDeleteSkill={deleteSkill}
+            totalPoints={totalPoints}
           />
         );
       case 'rules':
@@ -201,6 +203,7 @@ function App() {
             onDeleteViolation={deleteRuleViolation}
             onToggleRuleActive={toggleRuleActive}
             getRuleViolations={getRuleViolations}
+            totalPoints={totalPoints}
           />
         );
       case 'analytics':

@@ -5,6 +5,7 @@ import { Category } from '../types/category';
 import { SkillCard } from './SkillCard';
 import { AddSkillModal } from './AddSkillModal';
 import { LimitModal, LimitType } from './LimitModal';
+import { getRankFromPoints } from '../utils/rankingSystem';
 
 interface SkillsViewProps {
   skills: Skill[];
@@ -13,6 +14,7 @@ interface SkillsViewProps {
   onAddSkill: (skill: SkillFormData) => void;
   onUpdateSkill: (skillId: string, updates: Partial<Skill>) => void;
   onDeleteSkill: (skillId: string) => void;
+  totalPoints: number;
 }
 
 export const SkillsView: React.FC<SkillsViewProps> = ({
@@ -21,15 +23,18 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
   goals,
   onAddSkill,
   onUpdateSkill,
-  onDeleteSkill
+  onDeleteSkill,
+  totalPoints
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'SKILLS' });
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType, limitValue?: number}>({ isOpen: false, type: 'SKILLS' });
   const [filterStatus, setFilterStatus] = useState<'all' | 'Learning' | 'Learned' | 'Mastered'>('all');
 
+  const maxSkills = getRankFromPoints(totalPoints).maxSkills;
+
   const handleAddSkillClick = () => {
-    if (skills.length >= 3) {
-      setLimitModalConfig({ isOpen: true, type: 'SKILLS' });
+    if (skills.length >= maxSkills) {
+      setLimitModalConfig({ isOpen: true, type: 'SKILLS', limitValue: maxSkills });
     } else {
       setIsAddModalOpen(true);
     }
@@ -184,6 +189,7 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
         isOpen={limitModalConfig.isOpen}
         onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
         type={limitModalConfig.type}
+        limitValue={limitModalConfig.limitValue}
       />
     </div>
   );

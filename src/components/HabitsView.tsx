@@ -46,6 +46,12 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'HABITS' });
 
+  const today = getLocalDateString();
+  const storageKey = `arise_stamina_spent_${today}`;
+  const [staminaSpent, setStaminaSpent] = useState<number>(() => {
+    return parseInt(localStorage.getItem(storageKey) || '0', 10);
+  });
+
   const handleAddQuestClick = () => {
     if (habits.length >= 7) {
       setLimitModalConfig({ isOpen: true, type: 'HABITS' });
@@ -68,8 +74,6 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
     setEditingRoutine(null);
   };
 
-  const today = getLocalDateString();
-  const habitsCompletedToday = habits.filter(habit => habit.completedDates.includes(today)).length;
   const maxStamina = getRankFromPoints(totalPoints).stamina;
 
   const handleToggleCompleteWrapper = (habitId: string) => {
@@ -78,9 +82,16 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
     
     const isAlreadyCompleted = habit.completedDates.includes(today);
     
-    if (!isAlreadyCompleted && habitsCompletedToday >= maxStamina) {
-      setLimitModalConfig({ isOpen: true, type: 'STAMINA' });
-      return;
+    if (!isAlreadyCompleted) {
+      if (staminaSpent >= maxStamina) {
+        setLimitModalConfig({ isOpen: true, type: 'STAMINA' });
+        return;
+      }
+      
+      // Permanently consume stamina for today
+      const newStaminaSpent = staminaSpent + 1;
+      setStaminaSpent(newStaminaSpent);
+      localStorage.setItem(storageKey, newStaminaSpent.toString());
     }
     
     onToggleComplete(habitId);
@@ -104,7 +115,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
               <div className="flex items-center gap-2 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30">
                 <Battery size={14} className="text-blue-400" />
                 <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
-                  Stamina: {Math.max(0, maxStamina - habitsCompletedToday)} / {maxStamina}
+                  Stamina: {Math.max(0, maxStamina - staminaSpent)} / {maxStamina}
                 </span>
               </div>
             </div>

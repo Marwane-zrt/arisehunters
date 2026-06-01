@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthWrapper } from './components/AuthWrapper';
 import { UserMenu } from './components/UserMenu';
 import FriendsModal from './components/FriendsModal';
@@ -73,31 +73,7 @@ function App() {
     consumeStamina
   } = useSupabaseData();
 
-  useEffect(() => {
-    if (isLoading || totalPoints === undefined) return;
-    
-    const currentRankInfo = getRankFromPoints(totalPoints);
-    const storedRank = localStorage.getItem('lastAcknowledgedRank');
-    
-    if (!storedRank) {
-      localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
-    } else if (storedRank !== currentRankInfo.rank) {
-      const currentRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === currentRankInfo.rank);
-      const storedRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === storedRank);
-      
-      // Only show rank UP (not rank down, though rank down shouldn't be possible normally)
-      if (currentRankIndex > storedRankIndex) {
-        setRankUpData({
-          isOpen: true,
-          oldRank: RANK_THRESHOLDS[storedRankIndex],
-          newRank: currentRankInfo
-        });
-      } else {
-        // If somehow they ranked down, just update storage silently
-        localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
-      }
-    }
-  }, [totalPoints, isLoading]);
+
 
   if (isLoading) {
     return (
@@ -143,6 +119,32 @@ function App() {
   ).length;
   const totalStreak = habits.reduce((sum, habit) => sum + habit.streak, 0);
   const totalPoints = categories.reduce((sum, category) => sum + category.points, 0);
+
+  useEffect(() => {
+    if (isLoading || totalPoints === undefined) return;
+    
+    const currentRankInfo = getRankFromPoints(totalPoints);
+    const storedRank = localStorage.getItem('lastAcknowledgedRank');
+    
+    if (!storedRank) {
+      localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
+    } else if (storedRank !== currentRankInfo.rank) {
+      const currentRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === currentRankInfo.rank);
+      const storedRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === storedRank);
+      
+      // Only show rank UP (not rank down, though rank down shouldn't be possible normally)
+      if (currentRankIndex > storedRankIndex) {
+        setRankUpData({
+          isOpen: true,
+          oldRank: RANK_THRESHOLDS[storedRankIndex],
+          newRank: currentRankInfo
+        });
+      } else {
+        // If somehow they ranked down, just update storage silently
+        localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
+      }
+    }
+  }, [totalPoints, isLoading]);
 
   const handleDismissPenaltyMessage = () => {
     setDismissedPenaltyMessage(true);

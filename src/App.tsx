@@ -10,7 +10,8 @@ import { getLocalDateString } from './utils/dateUtils';
 import { Users, Loader2 } from 'lucide-react';
 import { VoiceflowWidget } from './components/VoiceflowWidget';
 import { LimitModal, LimitType } from './components/LimitModal';
-import { getRankFromPoints } from './utils/rankingSystem';
+import { RankUpModal } from './components/RankUpModal';
+import { RANK_THRESHOLDS, getRankFromPoints, RankInfo } from './utils/rankingSystem';
 
 // Lazy load views for better performance
 const HabitsView = lazy(() => import('./components/HabitsView').then(m => ({ default: m.HabitsView })));
@@ -26,6 +27,7 @@ type ViewType = 'habits' | 'goals' | 'skills' | 'rules' | 'analytics' | 'leaderb
 function App() {
   const [currentView, setCurrentView] = useState<ViewType>('habits');
   const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [rankUpData, setRankUpData] = useState<{isOpen: boolean, oldRank: RankInfo | null, newRank: RankInfo | null}>({isOpen: false, oldRank: null, newRank: null});
   const [dismissedPenaltyMessage, setDismissedPenaltyMessage] = useState(false);
   const [dismissedAutoRespectMessage, setDismissedAutoRespectMessage] = useState(false);
   const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'RANK_GATE' });
@@ -70,6 +72,32 @@ function App() {
     removeQuestFromRoutine,
     consumeStamina
   } = useSupabaseData();
+
+  useEffect(() => {
+    if (isLoading || totalPoints === undefined) return;
+    
+    const currentRankInfo = getRankFromPoints(totalPoints);
+    const storedRank = localStorage.getItem('lastAcknowledgedRank');
+    
+    if (!storedRank) {
+      localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
+    } else if (storedRank !== currentRankInfo.rank) {
+      const currentRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === currentRankInfo.rank);
+      const storedRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === storedRank);
+      
+      // Only show rank UP (not rank down, though rank down shouldn't be possible normally)
+      if (currentRankIndex > storedRankIndex) {
+        setRankUpData({
+          isOpen: true,
+          oldRank: RANK_THRESHOLDS[storedRankIndex],
+          newRank: currentRankInfo
+        });
+      } else {
+        // If somehow they ranked down, just update storage silently
+        localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
+      }
+    }
+  }, [totalPoints, isLoading]);
 
   if (isLoading) {
     return (
@@ -122,6 +150,13 @@ function App() {
 
   const handleDismissAutoRespectMessage = () => {
     setDismissedAutoRespectMessage(true);
+  };
+
+  const handleCloseRankUpModal = () => {
+    if (rankUpData.newRank) {
+      localStorage.setItem('lastAcknowledgedRank', rankUpData.newRank.rank);
+    }
+    setRankUpData({ isOpen: false, oldRank: null, newRank: null });
   };
 
   const handleGuildClick = () => {
@@ -307,6 +342,13 @@ function App() {
           />
         </div>
       </div>
+
+      <RankUpModal 
+        isOpen={rankUpData.isOpen}
+        onClose={handleCloseRankUpModal}
+        oldRank={rankUpData.oldRank}
+        newRank={rankUpData.newRank}
+      />
     </AuthWrapper>
   );
 }

@@ -40,6 +40,7 @@ export const useSupabaseData = () => {
   const [rules, setRules] = useState<Rule[]>([]);
   const [ruleViolations, setRuleViolations] = useState<RuleViolation[]>([]);
   const [routines, setRoutines] = useState<Routine[]>([]);
+  const [staminaSpent, setStaminaSpent] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [penaltyMessage, setPenaltyMessage] = useState<string>('');
@@ -179,6 +180,19 @@ export const useSupabaseData = () => {
       } catch (routinesError) {
         console.error('Error loading routines:', routinesError);
         setRoutines([]);
+      }
+
+      try {
+        const stats = await db.fetchUserStats();
+        const today = getLocalDateString();
+        if (stats && stats.lastStaminaDate === today) {
+          setStaminaSpent(stats.staminaSpent);
+        } else {
+          setStaminaSpent(0);
+        }
+      } catch (statsError) {
+        console.error('Error loading user stats:', statsError);
+        setStaminaSpent(0);
       }
 
       // Automatically apply penalties when loading data - this runs on every app open/login
@@ -823,6 +837,19 @@ export const useSupabaseData = () => {
     }
   };
 
+  const consumeStamina = async () => {
+    const today = getLocalDateString();
+    const newStamina = staminaSpent + 1;
+    setStaminaSpent(newStamina);
+    try {
+      await db.updateUserStamina(today, newStamina);
+    } catch (err) {
+      console.error('Error updating stamina in db:', err);
+      // Revert if failed
+      setStaminaSpent(staminaSpent);
+    }
+  };
+
   return {
     habits,
     goals,
@@ -831,6 +858,7 @@ export const useSupabaseData = () => {
     rules,
     ruleViolations,
     routines,
+    staminaSpent,
     isLoading,
     error,
     penaltyMessage,
@@ -860,6 +888,7 @@ export const useSupabaseData = () => {
     deleteRoutine,
     addQuestToRoutine,
     removeQuestFromRoutine,
+    consumeStamina,
     refreshData
   };
 };

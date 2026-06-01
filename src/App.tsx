@@ -38,6 +38,7 @@ function App() {
     rules,
     ruleViolations,
     routines,
+    staminaSpent,
     isLoading,
     error,
     penaltyMessage,
@@ -66,7 +67,8 @@ function App() {
     updateRoutine,
     deleteRoutine,
     addQuestToRoutine,
-    removeQuestFromRoutine
+    removeQuestFromRoutine,
+    consumeStamina
   } = useSupabaseData();
 
   if (isLoading) {
@@ -159,6 +161,8 @@ function App() {
             onAddQuestToRoutine={addQuestToRoutine}
             onRemoveQuestFromRoutine={removeQuestFromRoutine}
             totalPoints={totalPoints}
+            staminaSpent={staminaSpent}
+            consumeStamina={consumeStamina}
           />
         );
       case 'goals':

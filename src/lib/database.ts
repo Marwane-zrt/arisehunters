@@ -5,6 +5,7 @@ import { Goal, GoalFormData, Milestone } from '../types/goal';
 import { Skill, SkillFormData } from '../types/skill';
 import { Category, CategoryFormData } from '../types/category';
 import { Rule, RuleFormData, RuleViolation, RuleViolationFormData, RuleDailyCheck } from '../types/rule';
+import { UserStats } from '../types/userStats';
 
 // Categories
 export const fetchCategories = async (): Promise<Category[]> => {
@@ -731,4 +732,50 @@ export const deleteAccount = async (): Promise<void> => {
   }
 
   await supabase.auth.signOut();
+};
+
+// User Stats (Stamina)
+export const fetchUserStats = async (): Promise<UserStats | null> => {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) return null;
+
+  const { data, error } = await supabase
+    .from('user_stats')
+    .select('*')
+    .eq('user_id', user.user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching user stats:', error);
+    return null; // Fail gracefully
+  }
+
+  if (!data) return null;
+
+  return {
+    userId: data.user_id,
+    lastStaminaDate: data.last_stamina_date,
+    staminaSpent: data.stamina_spent
+  };
+};
+
+export const updateUserStamina = async (date: string, spent: number): Promise<void> => {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) return;
+
+  const { error } = await supabase
+    .from('user_stats')
+    .upsert({
+      user_id: user.user.id,
+      last_stamina_date: date,
+      stamina_spent: spent,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'user_id'
+    });
+
+  if (error) {
+    console.error('Error updating user stamina:', error);
+    throw error;
+  }
 };

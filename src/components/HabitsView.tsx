@@ -25,6 +25,8 @@ interface HabitsViewProps {
   onAddQuestToRoutine: (routineId: string, habitId: string) => void;
   onRemoveQuestFromRoutine: (routineId: string, habitId: string) => void;
   totalPoints: number;
+  staminaSpent: number;
+  consumeStamina: () => void;
 }
 
 export const HabitsView: React.FC<HabitsViewProps> = ({
@@ -39,7 +41,9 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   onDeleteRoutine,
   onAddQuestToRoutine,
   onRemoveQuestFromRoutine,
-  totalPoints
+  totalPoints,
+  staminaSpent,
+  consumeStamina
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddRoutineModalOpen, setIsAddRoutineModalOpen] = useState(false);
@@ -47,10 +51,6 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'HABITS' });
 
   const today = getLocalDateString();
-  const storageKey = `arise_stamina_spent_${today}`;
-  const [staminaSpent, setStaminaSpent] = useState<number>(() => {
-    return parseInt(localStorage.getItem(storageKey) || '0', 10);
-  });
 
   const handleAddQuestClick = () => {
     if (habits.length >= 7) {
@@ -88,10 +88,8 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
         return;
       }
       
-      // Permanently consume stamina for today
-      const newStaminaSpent = staminaSpent + 1;
-      setStaminaSpent(newStaminaSpent);
-      localStorage.setItem(storageKey, newStaminaSpent.toString());
+      // Permanently consume stamina in database
+      consumeStamina();
     }
     
     onToggleComplete(habitId);

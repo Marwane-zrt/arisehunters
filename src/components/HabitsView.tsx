@@ -8,6 +8,9 @@ import { AddHabitModal } from './AddHabitModal';
 import { RoutineCard } from './RoutineCard';
 import { AddRoutineModal } from './AddRoutineModal';
 import { LimitModal, LimitType } from './LimitModal';
+import { getLocalDateString } from '../utils/dateUtils';
+import { getRankFromPoints } from '../utils/rankingSystem';
+import { Battery } from 'lucide-react';
 
 interface HabitsViewProps {
   habits: Habit[];
@@ -21,6 +24,7 @@ interface HabitsViewProps {
   onDeleteRoutine: (routineId: string) => void;
   onAddQuestToRoutine: (routineId: string, habitId: string) => void;
   onRemoveQuestFromRoutine: (routineId: string, habitId: string) => void;
+  totalPoints: number;
 }
 
 export const HabitsView: React.FC<HabitsViewProps> = ({
@@ -34,7 +38,8 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   onUpdateRoutine,
   onDeleteRoutine,
   onAddQuestToRoutine,
-  onRemoveQuestFromRoutine
+  onRemoveQuestFromRoutine,
+  totalPoints
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddRoutineModalOpen, setIsAddRoutineModalOpen] = useState(false);
@@ -63,6 +68,24 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
     setEditingRoutine(null);
   };
 
+  const today = getLocalDateString();
+  const habitsCompletedToday = habits.filter(habit => habit.completedDates.includes(today)).length;
+  const maxStamina = getRankFromPoints(totalPoints).stamina;
+
+  const handleToggleCompleteWrapper = (habitId: string) => {
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return;
+    
+    const isAlreadyCompleted = habit.completedDates.includes(today);
+    
+    if (!isAlreadyCompleted && habitsCompletedToday >= maxStamina) {
+      setLimitModalConfig({ isOpen: true, type: 'STAMINA' });
+      return;
+    }
+    
+    onToggleComplete(habitId);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -76,8 +99,16 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
           </div>
           <div>
             <h2 className="text-3xl font-bold text-white tracking-wide">Daily Quests</h2>
-            <p className="text-blue-300 font-medium">Complete your missions to gain EXP</p>
-            <p className="text-red-300 text-sm font-medium">⚠️ Lose 1 point per uncompleted quest daily</p>
+            <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-1">
+              <p className="text-blue-300 font-medium">Complete your missions to gain EXP</p>
+              <div className="flex items-center gap-2 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30">
+                <Battery size={14} className="text-blue-400" />
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
+                  Stamina: {Math.max(0, maxStamina - habitsCompletedToday)} / {maxStamina}
+                </span>
+              </div>
+            </div>
+            <p className="text-red-300 text-sm font-medium mt-1">⚠️ Lose 1 point per uncompleted quest daily</p>
           </div>
         </div>
         
@@ -145,7 +176,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
                     key={routine.id}
                     routine={routine}
                     habits={habits}
-                    onToggleComplete={onToggleComplete}
+                    onToggleComplete={handleToggleCompleteWrapper}
                     onEditRoutine={handleEditRoutine}
                     onDeleteRoutine={onDeleteRoutine}
                     onAddQuestToRoutine={onAddQuestToRoutine}
@@ -168,7 +199,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
                   <HabitCard
                     key={habit.id}
                     habit={habit}
-                    onToggleComplete={onToggleComplete}
+                    onToggleComplete={handleToggleCompleteWrapper}
                     onDeleteHabit={onDeleteHabit}
                   />
                 ))}

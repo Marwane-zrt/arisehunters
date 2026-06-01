@@ -1,7 +1,7 @@
 import React from 'react';
-import { X, AlertTriangle, ShieldAlert, Zap, Target, Lock } from 'lucide-react';
+import { X, AlertTriangle, ShieldAlert, Zap, Target, Lock, Battery } from 'lucide-react';
 
-export type LimitType = 'HABITS' | 'GOALS' | 'RULES' | 'RANK_GATE' | 'LEADERBOARD';
+export type LimitType = 'HABITS' | 'GOALS' | 'RULES' | 'RANK_GATE' | 'LEADERBOARD' | 'STAMINA';
 
 interface LimitModalProps {
   isOpen: boolean;
@@ -59,6 +59,15 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type })
           borderColor: 'border-yellow-500/50',
           bgGlow: 'bg-yellow-500/20'
         };
+      case 'STAMINA':
+        return {
+          title: 'STAMINA EXHAUSTED',
+          message: 'Your Hunter stamina is depleted for today. You cannot earn more points from Daily Quests until tomorrow. Rest and recover.',
+          icon: <Battery className="text-blue-400 w-12 h-12" />,
+          color: 'from-blue-500 to-cyan-500',
+          borderColor: 'border-blue-500/50',
+          bgGlow: 'bg-blue-500/20'
+        };
     }
   };
 
@@ -96,7 +105,7 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type })
           </p>
 
           <div className="flex flex-col gap-3">
-            {type !== 'RANK_GATE' ? (
+            {(type !== 'RANK_GATE' && type !== 'STAMINA') ? (
               <a 
                 href="https://whop.com/arise-zrt" 
                 target="_blank" 

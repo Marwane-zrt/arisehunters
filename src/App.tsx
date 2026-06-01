@@ -158,6 +158,7 @@ function App() {
             onDeleteRoutine={deleteRoutine}
             onAddQuestToRoutine={addQuestToRoutine}
             onRemoveQuestFromRoutine={removeQuestFromRoutine}
+            totalPoints={totalPoints}
           />
         );
       case 'goals':

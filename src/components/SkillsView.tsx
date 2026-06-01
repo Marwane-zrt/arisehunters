@@ -4,6 +4,7 @@ import { Skill, SkillFormData } from '../types/skill';
 import { Category } from '../types/category';
 import { SkillCard } from './SkillCard';
 import { AddSkillModal } from './AddSkillModal';
+import { LimitModal, LimitType } from './LimitModal';
 
 interface SkillsViewProps {
   skills: Skill[];
@@ -23,7 +24,16 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
   onDeleteSkill
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'SKILLS' });
   const [filterStatus, setFilterStatus] = useState<'all' | 'Learning' | 'Learned' | 'Mastered'>('all');
+
+  const handleAddSkillClick = () => {
+    if (skills.length >= 3) {
+      setLimitModalConfig({ isOpen: true, type: 'SKILLS' });
+    } else {
+      setIsAddModalOpen(true);
+    }
+  };
 
   const learningSkills = skills.filter(skill => skill.status === 'Learning');
   const learnedSkills = skills.filter(skill => skill.status === 'Learned');
@@ -59,7 +69,7 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
         
         <div className="w-full sm:w-auto">
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddSkillClick}
             className="relative group w-full sm:w-auto"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -129,7 +139,7 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
             Every master was once a beginner.
           </p>
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddSkillClick}
             className="relative group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -168,6 +178,12 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
         onAddSkill={onAddSkill}
         categories={categories}
         goals={goals}
+      />
+
+      <LimitModal 
+        isOpen={limitModalConfig.isOpen}
+        onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
+        type={limitModalConfig.type}
       />
     </div>
   );

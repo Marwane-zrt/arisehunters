@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, AlertTriangle, ShieldAlert, Zap, Target, Lock, Battery } from 'lucide-react';
 
-export type LimitType = 'HABITS' | 'GOALS' | 'RULES' | 'RANK_GATE' | 'LEADERBOARD' | 'STAMINA';
+export type LimitType = 'HABITS' | 'GOALS' | 'RULES' | 'RANK_GATE' | 'LEADERBOARD' | 'STAMINA' | 'SKILLS';
 
 interface LimitModalProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type, l
       case 'GOALS':
         return {
           title: 'GOAL LIMIT REACHED',
-          message: 'E-Rank Hunters are restricted to 2 active long-term goals. To take on more Raids, you must reach C-Rank and join the Hunter Guild.',
+          message: 'E-Rank Hunters are restricted to 1 active long-term goal. To take on more Raids, you must reach C-Rank and join the Hunter Guild.',
           icon: <Target className="text-pink-500 w-12 h-12" />,
           color: 'from-pink-500 to-purple-600',
           borderColor: 'border-pink-500/50',
@@ -37,6 +37,15 @@ export const LimitModal: React.FC<LimitModalProps> = ({ isOpen, onClose, type, l
         return {
           title: 'SYSTEM ALERT: CAPACITY REACHED',
           message: 'A weak vessel cannot handle the burden of more than 3 strict rules. Build your discipline and ascend your rank to enforce more penalties.',
+          icon: <AlertTriangle className="text-orange-400 w-12 h-12" />,
+          color: 'from-orange-500 to-red-600',
+          borderColor: 'border-orange-500/50',
+          bgGlow: 'bg-orange-500/20'
+        };
+      case 'SKILLS':
+        return {
+          title: 'SYSTEM ALERT: SKILL SLOTS FULL',
+          message: 'E-Rank Hunters can only focus on mastering 3 skills at a time. To expand your learning capacity, ascend to a higher rank.',
           icon: <AlertTriangle className="text-orange-400 w-12 h-12" />,
           color: 'from-orange-500 to-red-600',
           borderColor: 'border-orange-500/50',

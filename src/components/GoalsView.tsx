@@ -34,7 +34,7 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
   const activeGoals = goals.filter(goal => !goal.isCompleted);
   
   const handleAddGoalClick = () => {
-    if (activeGoals.length >= 2) {
+    if (activeGoals.length >= 1) {
       setLimitModalConfig({ isOpen: true, type: 'GOALS' });
     } else {
       setIsAddModalOpen(true);

@@ -4,6 +4,7 @@ import { Goal, GoalFormData, Milestone } from '../types/goal';
 import { Category } from '../types/category';
 import { GoalCard } from './GoalCard';
 import { AddGoalModal } from './AddGoalModal';
+import { LimitModal, LimitType } from './LimitModal';
 import { getDaysUntilDeadline, isOverdue } from '../utils/dateUtils';
 
 interface GoalsViewProps {
@@ -28,8 +29,17 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
   onDeleteMilestone,
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'GOALS' });
 
   const activeGoals = goals.filter(goal => !goal.isCompleted);
+  
+  const handleAddGoalClick = () => {
+    if (activeGoals.length >= 3) {
+      setLimitModalConfig({ isOpen: true, type: 'GOALS' });
+    } else {
+      setIsAddModalOpen(true);
+    }
+  };
   const completedGoals = goals.filter(goal => goal.isCompleted);
   const overdueGoals = activeGoals.filter(goal => isOverdue(goal.targetDate));
   const upcomingGoals = activeGoals.filter(goal => {
@@ -56,7 +66,7 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
         
         <div className="w-full sm:w-auto">
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddGoalClick}
             className="relative group w-full sm:w-auto"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -131,7 +141,7 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
             Create meaningful goals with deadlines and milestones to track your progress and achieve success.
           </p>
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddGoalClick}
             className="relative group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -173,6 +183,13 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
         onClose={() => setIsAddModalOpen(false)}
         onAddGoal={onAddGoal}
         categories={categories}
+      />
+
+      {/* Limit Modal */}
+      <LimitModal
+        isOpen={limitModalConfig.isOpen}
+        onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
+        type={limitModalConfig.type}
       />
     </div>
   );

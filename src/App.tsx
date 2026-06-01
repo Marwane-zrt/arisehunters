@@ -9,6 +9,8 @@ import { useSupabaseData } from './hooks/useSupabaseData';
 import { getLocalDateString } from './utils/dateUtils';
 import { Users, Loader2 } from 'lucide-react';
 import { VoiceflowWidget } from './components/VoiceflowWidget';
+import { LimitModal, LimitType } from './components/LimitModal';
+import { getRankFromPoints } from './utils/rankingSystem';
 
 // Lazy load views for better performance
 const HabitsView = lazy(() => import('./components/HabitsView').then(m => ({ default: m.HabitsView })));
@@ -26,6 +28,7 @@ function App() {
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const [dismissedPenaltyMessage, setDismissedPenaltyMessage] = useState(false);
   const [dismissedAutoRespectMessage, setDismissedAutoRespectMessage] = useState(false);
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'RANK_GATE' });
 
   const {
     habits,
@@ -117,6 +120,15 @@ function App() {
 
   const handleDismissAutoRespectMessage = () => {
     setDismissedAutoRespectMessage(true);
+  };
+
+  const handleGuildClick = () => {
+    const currentRank = getRankFromPoints(totalPoints).rank;
+    if (currentRank === 'E' || currentRank === 'D') {
+      setLimitModalConfig({ isOpen: true, type: 'RANK_GATE' });
+    } else {
+      window.open('https://whop.com/arise-zrt', '_blank');
+    }
   };
 
   const renderCurrentView = () => {
@@ -253,6 +265,7 @@ function App() {
           <Navigation
             currentView={currentView}
             onViewChange={setCurrentView}
+            onGuildClick={handleGuildClick}
           />
 
           <main className="pb-8">
@@ -265,6 +278,13 @@ function App() {
           <FriendsModal
             isOpen={showFriendsModal}
             onClose={() => setShowFriendsModal(false)}
+          />
+
+          {/* Limit Modal */}
+          <LimitModal
+            isOpen={limitModalConfig.isOpen}
+            onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
+            type={limitModalConfig.type}
           />
         </div>
       </div>

@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Target, BarChart3, Settings, CheckSquare, Brain, Shield, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Target, BarChart3, Settings, CheckSquare, Brain, Shield, Trophy, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
 
-type ViewType = 'habits' | 'goals' | 'skills' | 'rules' | 'analytics' | 'leaderboard' | 'settings';
+type ViewType = 'habits' | 'goals' | 'skills' | 'rules' | 'analytics' | 'leaderboard' | 'settings' | 'guild';
 
 interface NavigationProps {
   currentView: ViewType;
   onViewChange: (view: ViewType) => void;
+  onGuildClick?: () => void;
 }
 
 const navigationItems = [
@@ -15,10 +16,11 @@ const navigationItems = [
   { id: 'rules' as ViewType, label: 'Rules', icon: Shield },
   { id: 'analytics' as ViewType, label: 'Stats', icon: BarChart3 },
   { id: 'leaderboard' as ViewType, label: 'Leaderboard', icon: Trophy },
-  { id: 'settings' as ViewType, label: 'Guild', icon: Settings },
+  { id: 'settings' as ViewType, label: 'Settings', icon: Settings },
+  { id: 'guild' as ViewType, label: 'Hunter Guild', icon: Crown },
 ];
 
-export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChange }) => {
+export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChange, onGuildClick }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -43,6 +45,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onViewChang
   };
 
   const handleViewChange = (view: ViewType) => {
+    if (view === 'guild' && onGuildClick) {
+      onGuildClick();
+      return;
+    }
     if (view !== currentView) {
       playNavigationSound();
       onViewChange(view);

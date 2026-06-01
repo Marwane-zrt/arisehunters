@@ -7,6 +7,7 @@ import { HabitCard } from './HabitCard';
 import { AddHabitModal } from './AddHabitModal';
 import { RoutineCard } from './RoutineCard';
 import { AddRoutineModal } from './AddRoutineModal';
+import { LimitModal, LimitType } from './LimitModal';
 
 interface HabitsViewProps {
   habits: Habit[];
@@ -38,6 +39,15 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddRoutineModalOpen, setIsAddRoutineModalOpen] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'HABITS' });
+
+  const handleAddQuestClick = () => {
+    if (habits.length >= 7) {
+      setLimitModalConfig({ isOpen: true, type: 'HABITS' });
+    } else {
+      setIsAddModalOpen(true);
+    }
+  };
 
   // Get habits that are not in any routine
   const habitsInRoutines = new Set(routines.flatMap(routine => routine.habitIds));
@@ -84,7 +94,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
           </button>
           
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddQuestClick}
             className="relative group w-full sm:w-auto"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -111,7 +121,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
             Every hunter starts with a single step.
           </p>
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddQuestClick}
             className="relative group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -185,6 +195,13 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
         routines={routines}
         editingRoutine={editingRoutine}
         onUpdateRoutine={onUpdateRoutine}
+      />
+
+      {/* Limit Modal */}
+      <LimitModal
+        isOpen={limitModalConfig.isOpen}
+        onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
+        type={limitModalConfig.type}
       />
     </div>
   );

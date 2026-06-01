@@ -4,6 +4,7 @@ import { Rule, RuleFormData, RuleViolation } from '../types/rule';
 import { Category } from '../types/category';
 import { RuleCard } from './RuleCard';
 import { AddRuleModal } from './AddRuleModal';
+import { LimitModal, LimitType } from './LimitModal';
 import { getTodayString } from '../utils/storage';
 
 interface RulesViewProps {
@@ -30,8 +31,17 @@ export const RulesView: React.FC<RulesViewProps> = ({
   getRuleViolations
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'RULES' });
 
   const activeRules = rules.filter(rule => rule.isActive);
+
+  const handleAddRuleClick = () => {
+    if (activeRules.length >= 3) {
+      setLimitModalConfig({ isOpen: true, type: 'RULES' });
+    } else {
+      setIsAddModalOpen(true);
+    }
+  };
   const totalRespectedToday = activeRules.filter(rule => {
     // Check if rule was respected today (this would need to be tracked in daily checks)
     return true; // Placeholder - would check actual daily check data
@@ -66,7 +76,7 @@ export const RulesView: React.FC<RulesViewProps> = ({
 
         <div className="w-full sm:w-auto">
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddRuleClick}
             className="relative group w-full sm:w-auto"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -113,7 +123,7 @@ export const RulesView: React.FC<RulesViewProps> = ({
             Build discipline through accountability and self-reflection.
           </p>
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleAddRuleClick}
             className="relative group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-all"></div>
@@ -216,6 +226,13 @@ export const RulesView: React.FC<RulesViewProps> = ({
         onClose={() => setIsAddModalOpen(false)}
         onAddRule={onAddRule}
         categories={categories}
+      />
+
+      {/* Limit Modal */}
+      <LimitModal
+        isOpen={limitModalConfig.isOpen}
+        onClose={() => setLimitModalConfig({ ...limitModalConfig, isOpen: false })}
+        type={limitModalConfig.type}
       />
     </div>
   );

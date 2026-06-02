@@ -60,21 +60,6 @@ export const sendFriendRequest = async (toUserId: string): Promise<FriendRequest
     throw new Error('No authenticated user');
   }
 
-
-  const { data: targetProfile, error: targetError } = await supabase
-    .from('user_profiles')
-    .select('user_id')
-    .eq('user_id', toUserId)
-    .maybeSingle();
-
-  if (targetError) {
-    throw new Error('Failed to validate target user');
-  }
-
-  if (!targetProfile) {
-    throw new Error('Target user not found');
-  }
-
   const { data: existingRequest, error: existingRequestError } = await supabase
     .from('friend_requests')
     .select('*')

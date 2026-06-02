@@ -108,6 +108,11 @@ const FriendsModal: React.FC<FriendsModalProps> = ({ isOpen, onClose }) => {
       setSearchResult(null);
       setSearchId('');
       await refreshFriends();
+    } else {
+      // Small timeout to allow the error state to update in the hook
+      setTimeout(() => {
+        setSearchError('Failed to send friend request. Please try again.');
+      }, 100);
     }
   };
 

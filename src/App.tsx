@@ -11,6 +11,7 @@ import { Users, Loader2 } from 'lucide-react';
 import { VoiceflowWidget } from './components/VoiceflowWidget';
 import { LimitModal, LimitType } from './components/LimitModal';
 import { RankUpModal } from './components/RankUpModal';
+import { useAuth } from './hooks/useAuth';
 import { RANK_THRESHOLDS, getRankFromPoints, RankInfo } from './utils/rankingSystem';
 
 // Lazy load views for better performance
@@ -31,6 +32,7 @@ function App() {
   const [dismissedPenaltyMessage, setDismissedPenaltyMessage] = useState(false);
   const [dismissedAutoRespectMessage, setDismissedAutoRespectMessage] = useState(false);
   const [limitModalConfig, setLimitModalConfig] = useState<{isOpen: boolean, type: LimitType}>({ isOpen: false, type: 'RANK_GATE' });
+  const { user } = useAuth();
 
   const {
     habits,
@@ -82,13 +84,14 @@ function App() {
   const totalPoints = categories.reduce((sum, category) => sum + category.points, 0);
 
   useEffect(() => {
-    if (isLoading || totalPoints === undefined) return;
+    if (isLoading || totalPoints === undefined || !user) return;
     
     const currentRankInfo = getRankFromPoints(totalPoints);
-    const storedRank = localStorage.getItem('lastAcknowledgedRank');
+    const storageKey = `lastAcknowledgedRank_${user.id}`;
+    const storedRank = localStorage.getItem(storageKey);
     
     if (!storedRank) {
-      localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
+      localStorage.setItem(storageKey, currentRankInfo.rank);
     } else if (storedRank !== currentRankInfo.rank) {
       const currentRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === currentRankInfo.rank);
       const storedRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === storedRank);
@@ -102,10 +105,10 @@ function App() {
         });
       } else {
         // If somehow they ranked down, just update storage silently
-        localStorage.setItem('lastAcknowledgedRank', currentRankInfo.rank);
+        localStorage.setItem(storageKey, currentRankInfo.rank);
       }
     }
-  }, [totalPoints, isLoading]);
+  }, [totalPoints, isLoading, user]);
 
   if (isLoading) {
     return (
@@ -157,8 +160,8 @@ function App() {
   };
 
   const handleCloseRankUpModal = () => {
-    if (rankUpData.newRank) {
-      localStorage.setItem('lastAcknowledgedRank', rankUpData.newRank.rank);
+    if (rankUpData.newRank && user) {
+      localStorage.setItem(`lastAcknowledgedRank_${user.id}`, rankUpData.newRank.rank);
     }
     setRankUpData({ isOpen: false, oldRank: null, newRank: null });
   };

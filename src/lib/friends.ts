@@ -288,7 +288,7 @@ export const getFriends = async (): Promise<FriendWithProfile[]> => {
   const { data, error } = await supabase
     .from('friends')
     .select('*')
-    .eq('user_id', user.id)
+    .or(`user_id.eq.${user.id},friend_user_id.eq.${user.id}`)
     .eq('status', 'accepted')
     .order('created_at', { ascending: false });
 
@@ -297,16 +297,20 @@ export const getFriends = async (): Promise<FriendWithProfile[]> => {
   }
 
   const profilePromises = data.map(async (item) => {
+    // If the current user is 'user_id', the friend is 'friend_user_id'
+    // If the current user is 'friend_user_id', the friend is 'user_id'
+    const actualFriendId = item.user_id === user.id ? item.friend_user_id : item.user_id;
+
     const { data: profile } = await supabase
       .from('user_profiles')
       .select('*')
-      .eq('user_id', item.friend_user_id)
+      .eq('user_id', actualFriendId)
       .maybeSingle();
 
     return {
       id: item.id,
-      userId: item.user_id,
-      friendUserId: item.friend_user_id,
+      userId: user.id, // Normalizing the view for the frontend
+      friendUserId: actualFriendId,
       status: item.status as 'pending' | 'accepted' | 'blocked',
       createdAt: new Date(item.created_at),
       updatedAt: new Date(item.updated_at),
@@ -319,7 +323,7 @@ export const getFriends = async (): Promise<FriendWithProfile[]> => {
         updatedAt: new Date(profile.updated_at)
       } : {
         id: 'unknown',
-        userId: item.friend_user_id,
+        userId: actualFriendId,
         uniqueId: '------',
         nickname: 'Unknown Hunter',
         createdAt: new Date(item.created_at),

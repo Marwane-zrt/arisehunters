@@ -432,25 +432,6 @@ export const useSupabaseData = () => {
 
   const deleteHabit = async (habitId: string) => {
     try {
-      const habit = habits.find(h => h.id === habitId);
-      if (habit && habit.completedDates.length > 0) {
-        const pointsToDeduct = habit.completedDates.length;
-        const categoryName = habit.category || 'General';
-        const categoryId = await db.findCategoryIdByName(categoryName);
-        
-        if (categoryId) {
-          await db.updateCategoryPoints(categoryId, -pointsToDeduct);
-          
-          const updatedCategories = categories.map(cat =>
-            cat.name === categoryName
-              ? { ...cat, points: Math.max(0, cat.points - pointsToDeduct) }
-              : cat
-          );
-          setCategories(updatedCategories);
-          updateCache('categories', updatedCategories);
-        }
-      }
-
       await db.deleteHabit(habitId);
       const updatedHabits = habits.filter(h => h.id !== habitId);
       setHabits(updatedHabits);

@@ -86,28 +86,30 @@ function App() {
   useEffect(() => {
     if (isLoading || totalPoints === undefined || !user) return;
     
-    const currentRankInfo = getRankFromPoints(totalPoints);
-    const storageKey = `lastAcknowledgedRank_${user.id}`;
-    const storedRank = localStorage.getItem(storageKey);
-    
-    if (!storedRank) {
-      localStorage.setItem(storageKey, currentRankInfo.rank);
-    } else if (storedRank !== currentRankInfo.rank) {
-      const currentRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === currentRankInfo.rank);
-      const storedRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === storedRank);
+    // Add a small delay to ensure all state is settled and prevent race conditions on initial load
+    const timer = setTimeout(() => {
+      const currentRankInfo = getRankFromPoints(totalPoints);
+      const storageKey = `lastAcknowledgedRank_${user.id}`;
+      const storedRank = localStorage.getItem(storageKey);
       
-      // Only show rank UP (not rank down, though rank down shouldn't be possible normally)
-      if (currentRankIndex > storedRankIndex) {
-        setRankUpData({
-          isOpen: true,
-          oldRank: RANK_THRESHOLDS[storedRankIndex],
-          newRank: currentRankInfo
-        });
-      } else {
-        // If somehow they ranked down, just update storage silently
+      if (!storedRank) {
         localStorage.setItem(storageKey, currentRankInfo.rank);
+      } else if (storedRank !== currentRankInfo.rank) {
+        const currentRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === currentRankInfo.rank);
+        const storedRankIndex = RANK_THRESHOLDS.findIndex(r => r.rank === storedRank);
+        
+        // Only show rank UP (not rank down, though rank down shouldn't be possible normally)
+        if (currentRankIndex > storedRankIndex) {
+          setRankUpData({
+            isOpen: true,
+            oldRank: RANK_THRESHOLDS[storedRankIndex],
+            newRank: currentRankInfo
+          });
+        }
       }
-    }
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [totalPoints, isLoading, user]);
 
   if (isLoading) {

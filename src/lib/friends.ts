@@ -152,13 +152,20 @@ export const getIncomingFriendRequests = async (): Promise<(FriendRequest & { fr
     status: item.status as 'pending' | 'accepted' | 'declined',
     createdAt: new Date(item.created_at),
     updatedAt: new Date(item.updated_at),
-    fromProfile: {
+    fromProfile: item.from_profile ? {
       id: item.from_profile.id,
       userId: item.from_profile.user_id,
       uniqueId: item.from_profile.unique_id,
       nickname: item.from_profile.nickname,
       createdAt: new Date(item.from_profile.created_at),
       updatedAt: new Date(item.from_profile.updated_at)
+    } : {
+      id: 'unknown',
+      userId: item.from_user_id,
+      uniqueId: '------',
+      nickname: 'Unknown Hunter',
+      createdAt: new Date(item.created_at),
+      updatedAt: new Date(item.updated_at)
     }
   }));
 };
@@ -257,13 +264,20 @@ export const getFriends = async (): Promise<FriendWithProfile[]> => {
     status: item.status as 'pending' | 'accepted' | 'blocked',
     createdAt: new Date(item.created_at),
     updatedAt: new Date(item.updated_at),
-    friendProfile: {
+    friendProfile: item.friend_profile ? {
       id: item.friend_profile.id,
       userId: item.friend_profile.user_id,
       uniqueId: item.friend_profile.unique_id,
       nickname: item.friend_profile.nickname,
       createdAt: new Date(item.friend_profile.created_at),
       updatedAt: new Date(item.friend_profile.updated_at)
+    } : {
+      id: 'unknown',
+      userId: item.friend_user_id,
+      uniqueId: '------',
+      nickname: 'Unknown Hunter',
+      createdAt: new Date(item.created_at),
+      updatedAt: new Date(item.updated_at)
     }
   }));
 };

@@ -167,10 +167,7 @@ export const getIncomingFriendRequests = async (): Promise<(FriendRequest & { fr
 
   const { data, error } = await supabase
     .from('friend_requests')
-    .select(`
-      *,
-      from_profile:user_profiles!friend_requests_from_user_id_fkey(*)
-    `)
+    .select('*')
     .eq('to_user_id', user.id)
     .eq('status', 'pending')
     .order('created_at', { ascending: false });
@@ -179,29 +176,40 @@ export const getIncomingFriendRequests = async (): Promise<(FriendRequest & { fr
     throw error;
   }
 
-  return data.map(item => ({
-    id: item.id,
-    fromUserId: item.from_user_id,
-    toUserId: item.to_user_id,
-    status: item.status as 'pending' | 'accepted' | 'declined',
-    createdAt: new Date(item.created_at),
-    updatedAt: new Date(item.updated_at),
-    fromProfile: item.from_profile ? {
-      id: item.from_profile.id,
-      userId: item.from_profile.user_id,
-      uniqueId: item.from_profile.unique_id,
-      nickname: item.from_profile.nickname,
-      createdAt: new Date(item.from_profile.created_at),
-      updatedAt: new Date(item.from_profile.updated_at)
-    } : {
-      id: 'unknown',
-      userId: item.from_user_id,
-      uniqueId: '------',
-      nickname: 'Unknown Hunter',
+  // Fetch profiles separately to avoid RLS filtering the whole row
+  const profilePromises = data.map(async (item) => {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', item.from_user_id)
+      .maybeSingle();
+      
+    return {
+      id: item.id,
+      fromUserId: item.from_user_id,
+      toUserId: item.to_user_id,
+      status: item.status as 'pending' | 'accepted' | 'declined',
       createdAt: new Date(item.created_at),
-      updatedAt: new Date(item.updated_at)
-    }
-  }));
+      updatedAt: new Date(item.updated_at),
+      fromProfile: profile ? {
+        id: profile.id,
+        userId: profile.user_id,
+        uniqueId: profile.unique_id,
+        nickname: profile.nickname,
+        createdAt: new Date(profile.created_at),
+        updatedAt: new Date(profile.updated_at)
+      } : {
+        id: 'unknown',
+        userId: item.from_user_id,
+        uniqueId: '------',
+        nickname: 'Unknown Hunter',
+        createdAt: new Date(item.created_at),
+        updatedAt: new Date(item.updated_at)
+      }
+    };
+  });
+
+  return Promise.all(profilePromises);
 };
 
 export const acceptFriendRequest = async (requestId: string): Promise<void> => {
@@ -279,10 +287,7 @@ export const getFriends = async (): Promise<FriendWithProfile[]> => {
 
   const { data, error } = await supabase
     .from('friends')
-    .select(`
-      *,
-      friend_profile:user_profiles!friends_friend_user_id_fkey(*)
-    `)
+    .select('*')
     .eq('user_id', user.id)
     .eq('status', 'accepted')
     .order('created_at', { ascending: false });
@@ -291,29 +296,39 @@ export const getFriends = async (): Promise<FriendWithProfile[]> => {
     throw error;
   }
 
-  return data.map(item => ({
-    id: item.id,
-    userId: item.user_id,
-    friendUserId: item.friend_user_id,
-    status: item.status as 'pending' | 'accepted' | 'blocked',
-    createdAt: new Date(item.created_at),
-    updatedAt: new Date(item.updated_at),
-    friendProfile: item.friend_profile ? {
-      id: item.friend_profile.id,
-      userId: item.friend_profile.user_id,
-      uniqueId: item.friend_profile.unique_id,
-      nickname: item.friend_profile.nickname,
-      createdAt: new Date(item.friend_profile.created_at),
-      updatedAt: new Date(item.friend_profile.updated_at)
-    } : {
-      id: 'unknown',
-      userId: item.friend_user_id,
-      uniqueId: '------',
-      nickname: 'Unknown Hunter',
+  const profilePromises = data.map(async (item) => {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', item.friend_user_id)
+      .maybeSingle();
+
+    return {
+      id: item.id,
+      userId: item.user_id,
+      friendUserId: item.friend_user_id,
+      status: item.status as 'pending' | 'accepted' | 'blocked',
       createdAt: new Date(item.created_at),
-      updatedAt: new Date(item.updated_at)
-    }
-  }));
+      updatedAt: new Date(item.updated_at),
+      friendProfile: profile ? {
+        id: profile.id,
+        userId: profile.user_id,
+        uniqueId: profile.unique_id,
+        nickname: profile.nickname,
+        createdAt: new Date(profile.created_at),
+        updatedAt: new Date(profile.updated_at)
+      } : {
+        id: 'unknown',
+        userId: item.friend_user_id,
+        uniqueId: '------',
+        nickname: 'Unknown Hunter',
+        createdAt: new Date(item.created_at),
+        updatedAt: new Date(item.updated_at)
+      }
+    };
+  });
+
+  return Promise.all(profilePromises);
 };
 
 export const removeFriend = async (friendUserId: string): Promise<void> => {

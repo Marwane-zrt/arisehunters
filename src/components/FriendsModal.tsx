@@ -114,11 +114,21 @@ const FriendsModal: React.FC<FriendsModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleAcceptRequest = async (requestId: string) => {
-    await acceptFriendRequest(requestId);
+    try {
+      setSearchError(null);
+      await acceptFriendRequest(requestId);
+    } catch (err: any) {
+      setSearchError(err.message || 'Failed to accept friend request');
+    }
   };
 
   const handleDeclineRequest = async (requestId: string) => {
-    await declineFriendRequest(requestId);
+    try {
+      setSearchError(null);
+      await declineFriendRequest(requestId);
+    } catch (err: any) {
+      setSearchError(err.message || 'Failed to decline friend request');
+    }
   };
 
   const handleRemoveFriend = async (friendUserId: string) => {
@@ -206,7 +216,25 @@ const FriendsModal: React.FC<FriendsModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Content Area */}
-          <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+          <div className="p-8 overflow-y-auto custom-scrollbar flex-1 relative">
+            
+            {/* Global Error Display */}
+            {(searchError || error) && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3">
+                <XIcon className="text-red-400 shrink-0 mt-0.5" size={20} />
+                <div className="flex-1">
+                  <h4 className="text-red-400 font-bold text-sm mb-1 uppercase tracking-wider">Operation Failed</h4>
+                  <p className="text-red-400/80 text-sm whitespace-pre-line">{searchError || error}</p>
+                </div>
+                <button 
+                  onClick={() => setSearchError(null)}
+                  className="text-red-400/50 hover:text-red-400 transition-colors"
+                >
+                  <XIcon size={16} />
+                </button>
+              </div>
+            )}
+
             {/* Friends Tab */}
             {activeTab === 'friends' && (
               <div className="space-y-4">

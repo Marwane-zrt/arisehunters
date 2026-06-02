@@ -74,7 +74,41 @@ export const sendFriendRequest = async (toUserId: string): Promise<FriendRequest
 
   if (existingRequestRecord) {
     if (existingRequestRecord.status === 'pending') {
-      throw new Error('A pending friend request already exists between these users');
+      // If the target user already sent a request to the current user, auto-accept it!
+      if (existingRequestRecord.to_user_id === user.id) {
+        const { error: updateError } = await supabase
+          .from('friend_requests')
+          .update({ status: 'accepted' })
+          .eq('id', existingRequestRecord.id);
+
+        if (updateError) {
+          throw new Error('Failed to auto-accept existing friend request');
+        }
+
+        const { error: friendError } = await supabase
+          .from('friends')
+          .insert({
+            user_id: user.id,
+            friend_user_id: toUserId,
+            status: 'accepted'
+          });
+
+        if (friendError) {
+          throw new Error('Failed to create friendship');
+        }
+        
+        // Return a special status or just let it succeed
+        return {
+          id: existingRequestRecord.id,
+          fromUserId: existingRequestRecord.from_user_id,
+          toUserId: existingRequestRecord.to_user_id,
+          status: 'accepted',
+          createdAt: new Date(existingRequestRecord.created_at),
+          updatedAt: new Date()
+        };
+      }
+      
+      throw new Error('You already sent a friend request to this user. They must accept it first.');
     } else if (existingRequestRecord.status === 'accepted') {
       throw new Error('You are already friends with this user');
     } else if (existingRequestRecord.status === 'declined') {

@@ -51,14 +51,14 @@ export const useFriends = () => {
     return result;
   };
 
-  const sendFriendRequest = async (toUserId: string): Promise<boolean> => {
+  const sendFriendRequest = async (toUserId: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setError(null);
       await friendsApi.sendFriendRequest(toUserId);
-      return true;
+      return { success: true };
     } catch (err: any) {
       setError(err.message || 'Failed to send friend request');
-      return false;
+      return { success: false, error: err.message || 'Failed to send friend request' };
     }
   };
 

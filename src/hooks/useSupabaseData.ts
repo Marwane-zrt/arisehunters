@@ -392,36 +392,42 @@ export const useSupabaseData = () => {
               if (generalCategoryId) {
                 await db.updateCategoryPoints(generalCategoryId, pointsChange);
 
-                const updatedCategories = categories.map(cat =>
-                  cat.name === 'General'
-                    ? { ...cat, points: Math.max(0, cat.points + pointsChange) }
-                    : cat
-                );
-                setCategories(updatedCategories);
-                updateCache('categories', updatedCategories);
+                setCategories(prev => {
+                  const updated = prev.map(cat =>
+                    cat.name === 'General'
+                      ? { ...cat, points: Math.max(0, cat.points + pointsChange) }
+                      : cat
+                  );
+                  updateCache('categories', updated);
+                  return updated;
+                });
               }
             }
           } else {
             await db.updateCategoryPoints(categoryId, pointsChange);
 
-            const updatedCategories = categories.map(cat =>
-              cat.name === categoryName
-                ? { ...cat, points: Math.max(0, cat.points + pointsChange) }
-                : cat
-            );
-            setCategories(updatedCategories);
-            updateCache('categories', updatedCategories);
+            setCategories(prev => {
+              const updated = prev.map(cat =>
+                cat.name === categoryName
+                  ? { ...cat, points: Math.max(0, cat.points + pointsChange) }
+                  : cat
+              );
+              updateCache('categories', updated);
+              return updated;
+            });
           }
         } else {
           await db.updateCategoryPoints(categoryId, pointsChange);
 
-          const updatedCategories = categories.map(cat =>
-            cat.name === categoryName
-              ? { ...cat, points: Math.max(0, cat.points + pointsChange) }
-              : cat
-          );
-          setCategories(updatedCategories);
-          updateCache('categories', updatedCategories);
+          setCategories(prev => {
+            const updated = prev.map(cat =>
+              cat.name === categoryName
+                ? { ...cat, points: Math.max(0, cat.points + pointsChange) }
+                : cat
+            );
+            updateCache('categories', updated);
+            return updated;
+          });
         }
       }
     } catch (err) {

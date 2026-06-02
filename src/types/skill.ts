@@ -12,6 +12,9 @@ export interface Skill {
   color: string;
   createdAt: Date;
   linkedGoalId?: string; // Link to a goal from raids section
+  totalLearningTime: number; // Total time spent learning in seconds
+  isTimerActive: boolean;
+  lastTimerStart?: Date;
 }
 
 export interface SkillFormData {

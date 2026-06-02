@@ -404,7 +404,10 @@ export const fetchSkills = async (): Promise<Skill[]> => {
     progress: item.progress,
     color: item.color,
     linkedGoalId: item.linked_goal_id,
-    createdAt: new Date(item.created_at)
+    createdAt: new Date(item.created_at),
+    totalLearningTime: item.total_learning_time || 0,
+    isTimerActive: item.is_timer_active || false,
+    lastTimerStart: item.last_timer_start ? new Date(item.last_timer_start) : undefined
   }));
 };
 
@@ -461,7 +464,10 @@ export const createSkill = async (skillData: SkillFormData): Promise<Skill> => {
     progress: data.progress,
     color: data.color,
     linkedGoalId: data.linked_goal_id,
-    createdAt: new Date(data.created_at)
+    createdAt: new Date(data.created_at),
+    totalLearningTime: data.total_learning_time || 0,
+    isTimerActive: data.is_timer_active || false,
+    lastTimerStart: data.last_timer_start ? new Date(data.last_timer_start) : undefined
   };
 };
 
@@ -479,6 +485,9 @@ export const updateSkill = async (skillId: string, updates: Partial<Skill>): Pro
     // Attempting to clear the goal, safely setting it to null
     updateData.linked_goal_id = null;
   }
+  if (updates.totalLearningTime !== undefined) updateData.total_learning_time = updates.totalLearningTime;
+  if (updates.isTimerActive !== undefined) updateData.is_timer_active = updates.isTimerActive;
+  if (updates.lastTimerStart !== undefined) updateData.last_timer_start = updates.lastTimerStart?.toISOString();
 
   const { error } = await supabase
     .from('skills')

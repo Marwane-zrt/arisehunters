@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Brain, Calendar, BookOpen, ExternalLink, Trash2, Edit, Target, Trophy, Star, Flag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Brain, Calendar, BookOpen, ExternalLink, Trash2, Edit, Target, Trophy, Star, Flag, Play, Pause, Clock } from 'lucide-react';
 import { Skill } from '../types/skill';
 import { Goal } from '../types/goal';
 
@@ -20,6 +20,47 @@ export const SkillCard: React.FC<SkillCardProps> = ({
   const [editProgress, setEditProgress] = useState(skill.progress);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState(skill.linkedGoalId || '');
+  const [liveTimer, setLiveTimer] = useState(skill.totalLearningTime);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (skill.isTimerActive && skill.lastTimerStart) {
+      const calculateElapsed = () => {
+        const start = new Date(skill.lastTimerStart!).getTime();
+        const now = Date.now();
+        const elapsed = Math.floor((now - start) / 1000);
+        setLiveTimer(skill.totalLearningTime + elapsed);
+      };
+      
+      calculateElapsed();
+      interval = setInterval(calculateElapsed, 1000);
+    } else {
+      setLiveTimer(skill.totalLearningTime);
+    }
+    
+    return () => clearInterval(interval);
+  }, [skill.isTimerActive, skill.lastTimerStart, skill.totalLearningTime]);
+
+  const toggleTimer = () => {
+    if (skill.isTimerActive) {
+      onUpdateSkill(skill.id, {
+        isTimerActive: false,
+        totalLearningTime: liveTimer
+      });
+    } else {
+      onUpdateSkill(skill.id, {
+        isTimerActive: true,
+        lastTimerStart: new Date()
+      });
+    }
+  };
+
+  const formatLiveTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -127,6 +168,46 @@ export const SkillCard: React.FC<SkillCardProps> = ({
         {/* Description */}
         {skill.description && (
           <p className="text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{skill.description}</p>
+        )}
+
+        {/* Live Training Timer */}
+        {skill.status === 'Learning' && (
+          <div className={`mb-4 flex items-center justify-between p-3 rounded-lg border transition-all ${
+            skill.isTimerActive 
+              ? 'bg-blue-500/10 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]' 
+              : 'bg-gray-800/50 border-gray-700'
+          }`}>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTimer}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  skill.isTimerActive
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                }`}
+              >
+                {skill.isTimerActive ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-1" />}
+              </button>
+              <div>
+                <div className="text-xs text-gray-400 font-medium tracking-wider uppercase mb-0.5">
+                  Training Time
+                </div>
+                <div className={`text-lg sm:text-xl font-mono font-bold tracking-wider ${
+                  skill.isTimerActive ? 'text-blue-400' : 'text-gray-300'
+                }`}>
+                  {formatLiveTime(liveTimer)}
+                </div>
+              </div>
+            </div>
+            
+            {skill.isTimerActive && (
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+            )}
+          </div>
         )}
 
         {/* Progress Bar */}

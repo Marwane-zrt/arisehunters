@@ -8,8 +8,24 @@ export const searchUserByUniqueId = async (uniqueId: string): Promise<FriendProf
     throw new Error('Invalid ID format. Please enter exactly 8 digits.');
   }
 
-
   try {
+    // Try using RPC first (bypasses RLS)
+    const { data: rpcData, error: rpcError } = await supabase
+      .rpc('search_hunter_by_id', { target_id: cleanId })
+      .maybeSingle();
+
+    if (!rpcError && rpcData) {
+      return {
+        id: rpcData.id,
+        userId: rpcData.user_id,
+        uniqueId: rpcData.unique_id,
+        nickname: rpcData.nickname,
+        createdAt: new Date(rpcData.created_at),
+        updatedAt: new Date(rpcData.updated_at)
+      };
+    }
+
+    // Fallback to direct table query if RPC is not available or fails
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
